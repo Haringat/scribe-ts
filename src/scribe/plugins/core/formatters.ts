@@ -1,14 +1,7 @@
-define([
-  './formatters/html/replace-nbsp-chars',
-  './formatters/plain-text/escape-html-characters'
-], function (
-  replaceNbspCharsFormatter,
-  escapeHtmlCharactersFormatter
-) {
-  'use strict';
-
-  return {
+import replaceNbspCharsFormatter = require("./formatters/html/replace-nbsp-chars") 
+import escapeHtmlCharactersFormatter = require("./formatters/plain-text/escape-html-characters") 
+  var formatters = {
     replaceNbspCharsFormatter: replaceNbspCharsFormatter,
     escapeHtmlCharactersFormatter: escapeHtmlCharactersFormatter
-  };
-});
+  }
+  export = formatters

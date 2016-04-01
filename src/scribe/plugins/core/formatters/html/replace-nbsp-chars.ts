@@ -1,12 +1,8 @@
-define(function () {
-
   /**
    * Chrome:
    */
 
-  'use strict';
-
-  return function () {
+  export = function () {
     return function (scribe) {
       var nbspCharRegExp = /(\s|&nbsp;)+/g;
 
@@ -16,5 +12,3 @@ define(function () {
       });
     };
   };
-
-});

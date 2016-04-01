@@ -1,8 +1,6 @@
-define(['lodash-amd/modern/object/assign'], function (assign) {
+import * as assign from 'lodash-amd/modern/object/assign'
 
-  'use strict';
-
-  return function (scribe) {
+  export = function (scribe) {
     function TransactionManager() {
       this.history = [];
     }
@@ -38,4 +36,3 @@ define(['lodash-amd/modern/object/assign'], function (assign) {
 
     return TransactionManager;
   };
-});

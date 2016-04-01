@@ -1,20 +1,10 @@
-define([
-  './patches/commands/bold',
-  './patches/commands/indent',
-  './patches/commands/insert-html',
-  './patches/commands/insert-list',
-  './patches/commands/outdent',
-  './patches/commands/create-link',
-  './patches/events'
-], function (
-  boldCommand,
-  indentCommand,
-  insertHTMLCommand,
-  insertListCommands,
-  outdentCommand,
-  createLinkCommand,
-  events
-) {
+import bold = require("./patches/commands/bold")
+import indent = require("./patches/commands/indent")
+import insertHTML = require("./patches/commands/insert-html")
+import insertList = require("./patches/commands/insert-list")
+import outdent = require("./patches/commands/outdent")
+import createLink = require("./patches/commands/create-link")
+import events = require("./patches/events")
 
   /**
    * Command patches browser inconsistencies. They do not perform core features
@@ -22,18 +12,16 @@ define([
    * applying/unapplying commands — that is the job of the core commands.
    */
 
-  'use strict';
-
-  return {
+  var patches = {
     commands: {
-      bold: boldCommand,
-      indent: indentCommand,
-      insertHTML: insertHTMLCommand,
-      insertList: insertListCommands,
-      outdent: outdentCommand,
-      createLink: createLinkCommand,
+      bold,
+      indent,
+      insertHTML,
+      insertList,
+      outdent,
+      createLink,
     },
-    events: events
+    events
   };
 
-});
+export = patches

@@ -1,7 +1,5 @@
-define([
-  './node',
-  './mutations'
-], function (nodeHelpers, mutations) {
+import nodeHelpers = require("./node")
+import mutations = require("./mutations")
 
   var maybeWindow = typeof window === 'object' ? window : undefined;
 
@@ -19,7 +17,7 @@ define([
     });
   }
 
-  function observeDomChanges(el, callback) {
+  export = function observeDomChanges(el, callback) {
     // Flag to avoid running recursively
     var runningPostMutation = false;
 
@@ -49,6 +47,3 @@ define([
 
     return observer;
   }
-
-  return observeDomChanges;
-});

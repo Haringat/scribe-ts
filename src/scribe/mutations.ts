@@ -1,6 +1,4 @@
-define([], function() {
-
-  function determineMutationObserver(window) {
+  export function determineMutationObserver(window) {
     // This enables server side rendering
     if (typeof window === 'undefined') {
       // Stub observe function to avoid error
@@ -15,8 +13,3 @@ define([], function() {
         window.MozMutationObserver;
     }
   }
-
-  return {
-    determineMutationObserver: determineMutationObserver
-  };
-});

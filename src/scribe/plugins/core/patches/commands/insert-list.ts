@@ -1,8 +1,4 @@
-define([], function () {
-
-  'use strict';
-
-  return function () {
+  export = function () {
     return function (scribe) {
       var nodeHelpers = scribe.node;
 
@@ -87,5 +83,3 @@ define([], function () {
       scribe.commandPatches.insertUnorderedList = new InsertListCommandPatch('insertUnorderedList');
     };
   };
-
-});

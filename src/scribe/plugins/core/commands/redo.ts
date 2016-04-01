@@ -1,8 +1,4 @@
-define(function () {
-
-  'use strict';
-
-  return function () {
+  export = function () {
     return function (scribe) {
       var redoCommand = new scribe.api.Command('redo');
 
@@ -27,5 +23,3 @@ define(function () {
       }
     };
   };
-
-});

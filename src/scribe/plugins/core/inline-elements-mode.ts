@@ -1,7 +1,3 @@
-define(function () {
-
-  'use strict';
-
   // TODO: abstract
   function hasContent(rootNode) {
     var treeWalker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ALL, null, false);
@@ -18,7 +14,7 @@ define(function () {
     return false;
   }
 
-  return function () {
+  export = function () {
     return function (scribe) {
       /**
        * Firefox has a `insertBrOnReturn` command, but this is not a part of
@@ -111,4 +107,3 @@ define(function () {
       }
     };
   };
-});

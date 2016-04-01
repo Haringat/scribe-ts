@@ -1,4 +1,4 @@
-define(['immutable'], function (immutable) {
+import immutable = require("immutable")
 
   var blockModePlugins = [
     'setRootPElement',
@@ -108,11 +108,10 @@ define(['immutable'], function (immutable) {
     }
   }
 
-  return {
+  export = {
     defaultOptions: defaultOptions,
     checkOptions: checkOptions,
     sortByPlugin: sortByPlugin,
     filterByBlockLevelMode: filterByBlockLevelMode,
     filterByPluginExists: filterByPluginExists
   }
-});

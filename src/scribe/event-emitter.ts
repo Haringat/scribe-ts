@@ -1,6 +1,4 @@
-define(['immutable'], function (Immutable) {
-
-  'use strict';
+import Immutable = require("immutable")
 
   // TODO: once
   // TODO: unit test
@@ -39,6 +37,4 @@ define(['immutable'], function (Immutable) {
     }
   };
 
-  return EventEmitter;
-
-});
+  export = EventEmitter;

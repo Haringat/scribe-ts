@@ -1,8 +1,4 @@
-define(function () {
-
-  'use strict';
-
-  return function (scribe) {
+  export = function (scribe) {
     var rootDoc = scribe.el.ownerDocument;
     var nodeHelpers = scribe.node;
 
@@ -180,5 +176,3 @@ define(function () {
 
     return Selection;
   };
-
-});

@@ -1,14 +1,7 @@
-define([
-  '../../dom-observer',
-  'immutable'
-], function (
-  observeDomChanges,
-  Immutable
-) {
+import observeDomChanges = require("../../dom-observer")
+import Immutable = require("immutable")
 
-  'use strict';
-
-  return function () {
+  export = function () {
     return function (scribe) {
       var nodeHelpers = scribe.node;
 
@@ -244,4 +237,3 @@ define([
 
     };
   };
-});

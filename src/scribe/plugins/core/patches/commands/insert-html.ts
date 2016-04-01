@@ -1,6 +1,4 @@
-define([], function () {
-  "use strict";
-  return function () {
+  export = function () {
     return function (scribe) {
       var insertHTMLCommandPatch = new scribe.api.CommandPatch('insertHTML');
       var nodeHelpers = scribe.node;
@@ -15,5 +13,3 @@ define([], function () {
       scribe.commandPatches.insertHTML = insertHTMLCommandPatch;
     };
   };
-
-});

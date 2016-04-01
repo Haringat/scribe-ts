@@ -1,8 +1,4 @@
-define(function () {
-
-  'use strict';
-
-  return function () {
+  export = function () {
     return function (scribe) {
       var indentCommand = new scribe.api.Command('indent');
 
@@ -24,5 +20,3 @@ define(function () {
       scribe.commands.indent = indentCommand;
     };
   };
-
-});

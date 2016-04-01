@@ -1,15 +1,7 @@
-define([
-  'lodash-amd/modern/string/escape'
-], function (
-  escape
-) {
+import escape = require("lodash-amd/modern/string/escape")
 
-  'use strict';
-
-  return function () {
+  export = function () {
     return function (scribe) {
       scribe.registerPlainTextFormatter(escape);
     };
   };
-
-});

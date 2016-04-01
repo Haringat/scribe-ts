@@ -1,8 +1,4 @@
-define([], function () {
-
-  'use strict';
-
-  return function () {
+  export =function () {
     return function (scribe) {
       // TODO: do we need to run this on every key press, or could we
       //       detect when the issue may have occurred?
@@ -48,4 +44,3 @@ define([], function () {
       }
     };
   };
-});

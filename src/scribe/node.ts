@@ -1,10 +1,6 @@
-define([
-  './constants/inline-element-names',
-  './constants/block-element-names',
-  'immutable'
-], function (inlineElementNames, blockElementNames, Immutable) {
-
-  'use strict';
+import inlineElementNames = require("./constants/inline-element-names")
+import blockElementNames = require("./constants/block-element-names")
+import Immutable = require("immutable")
 
   function isBlockElement(node) {
     return blockElementNames.includes(node.nodeName);
@@ -158,7 +154,7 @@ define([
     });
   }
 
-  return {
+  export = {
     isInlineElement: isInlineElement,
     isBlockElement: isBlockElement,
     isEmptyInlineElement: isEmptyInlineElement,
@@ -179,5 +175,3 @@ define([
     removeChromeArtifacts: removeChromeArtifacts,
     elementHasClass: elementHasClass
   };
-
-});

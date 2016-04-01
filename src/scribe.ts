@@ -1,32 +1,15 @@
-define([
-  './scribe/plugins/core/plugins',
-  './scribe/plugins/core/commands',
-  './scribe/plugins/core/formatters',
-  './scribe/plugins/core/events',
-  './scribe/plugins/core/patches',
-  './scribe/api',
-  './scribe/transaction-manager',
-  './scribe/undo-manager',
-  './scribe/event-emitter',
-  './scribe/node',
-  'immutable',
-  './scribe/config'
-], function (
-  plugins,
-  commands,
-  formatters,
-  events,
-  patches,
-  Api,
-  buildTransactionManager,
-  UndoManager,
-  EventEmitter,
-  nodeHelpers,
-  Immutable,
-  config
-) {
-
-  'use strict';
+import * as plugins from './scribe/plugins/core/plugins'
+import * as commands from './scribe/plugins/core/commands'
+import * as formatters from './scribe/plugins/core/formatters'
+import * as events from "./scribe/plugins/core/events"
+import * as patches from './scribe/plugins/core/patches'
+import * as Api from './scribe/api'
+import * as buildTransactionManager from './scribe/transaction-manager'
+import * as UndoManager from './scribe/undo-manager'
+import EventEmitter from './scribe/event-emitter'
+import * as nodeHelpers from './scribe/node'
+import Immutable = require("immutable")
+import * as config from './scribe/config'
 
   function Scribe(el, options) {
     EventEmitter.call(this);
@@ -337,6 +320,4 @@ define([
     }, html);
   };
 
-  return Scribe;
-
-});
+  export = Scribe;

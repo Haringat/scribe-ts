@@ -1,8 +1,4 @@
-define(function () {
-
-  'use strict';
-
-  return function (scribe) {
+  export = function (scribe) {
     function CommandPatch(commandName) {
       this.commandName = commandName;
     }
@@ -23,5 +19,3 @@ define(function () {
 
     return CommandPatch;
   };
-
-});

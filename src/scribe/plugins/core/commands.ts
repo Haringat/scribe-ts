@@ -1,31 +1,19 @@
-define([
-  './commands/indent',
-  './commands/insert-list',
-  './commands/outdent',
-  './commands/redo',
-  './commands/subscript',
-  './commands/superscript',
-  './commands/undo'
-], function (
-  indent,
-  insertList,
-  outdent,
-  redo,
-  subscript,
-  superscript,
-  undo
-) {
+import indent = require("./commands/indent")
+import insertList = require("./commands/insert-list")
+import outdent = require("./commands/outdent")
+import redo = require("./commands/redo")
+import subscript = require("./commands/subscript")
+import superscript = require("./commands/superscript")
+import undo = require("./commands/undo")
 
-  'use strict';
+var plugins = {
+    indent,
+    insertList,
+    outdent,
+    redo,
+    subscript,
+    superscript,
+    undo
+}
 
-  return {
-    indent: indent,
-    insertList: insertList,
-    outdent: outdent,
-    redo: redo,
-    subscript: subscript,
-    superscript: superscript,
-    undo: undo
-  };
-
-});
+export = plugins

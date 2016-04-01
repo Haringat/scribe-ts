@@ -1,8 +1,4 @@
-define(function () {
-
-  'use strict';
-
-  return function () {
+  export = function () {
     return function (scribe) {
       var outdentCommand = new scribe.api.Command('outdent');
 
@@ -25,5 +21,3 @@ define(function () {
       scribe.commands.outdent = outdentCommand;
     };
   };
-
-});

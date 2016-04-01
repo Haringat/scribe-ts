@@ -1,15 +1,11 @@
-define([
-  'immutable'
-], function (Immutable) {
+import Immutable = require("immutable")
 
   /**
    * If the paragraphs option is set to true, then when the list is
    * unapplied, ensure that we enter a P element.
    */
 
-  'use strict';
-
-  return function () {
+  export = function () {
     return function (scribe) {
       var nodeHelpers = scribe.node;
 
@@ -129,5 +125,3 @@ define([
       scribe.commands.insertUnorderedList = new InsertListCommand('insertUnorderedList');
     };
   };
-
-});

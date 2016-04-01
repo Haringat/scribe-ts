@@ -1,15 +1,11 @@
-define(function () {
-
   /**
    * Prevent Chrome from inserting BLOCKQUOTEs inside of Ps, and also from
    * adding a redundant `style` attribute to the created BLOCKQUOTE.
    */
 
-  'use strict';
-
   var INVISIBLE_CHAR = '\uFEFF';
 
-  return function () {
+  export = function () {
     return function (scribe) {
       var indentCommand = new scribe.api.CommandPatch('indent');
 
@@ -62,5 +58,3 @@ define(function () {
       scribe.commandPatches.indent = indentCommand;
     };
   };
-
-});

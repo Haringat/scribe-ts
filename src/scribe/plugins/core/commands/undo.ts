@@ -1,8 +1,4 @@
-define(function () {
-
-  'use strict';
-
-  return function () {
+  export = function () {
     return function (scribe) {
       var undoCommand = new scribe.api.Command('undo');
 
@@ -27,5 +23,3 @@ define(function () {
       }
     };
   };
-
-});

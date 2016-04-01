@@ -1,20 +1,13 @@
-define([
-  './set-root-p-element',
-  './formatters/html/enforce-p-elements',
-  './formatters/html/ensure-selectable-containers',
-  './inline-elements-mode'
-], function (
-  setRootPElement,
-  enforcePElements,
-  ensureSelectableContainers,
-  inlineElementsMode
-) {
-  'use strict';
+import setRootPElement = require("./set-root-p-element")
+import enforcePElements = require("./formatters/html/enforce-p-elements")
+import ensureSelectableContainers = require("./formatters/html/ensure-selectable-containers")
+import inlineElementsMode = require("./inline-elements-mode")
 
-  return {
-    setRootPElement: setRootPElement,
-    enforcePElements: enforcePElements,
-    ensureSelectableContainers: ensureSelectableContainers,
-    inlineElementsMode: inlineElementsMode
-  };
-});
+  var plugins = {
+    setRootPElement,
+    enforcePElements,
+    ensureSelectableContainers,
+    inlineElementsMode
+  }
+
+export = plugins
