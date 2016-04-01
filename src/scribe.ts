@@ -1,16 +1,16 @@
 define([
-  './plugins/core/plugins',
-  './plugins/core/commands',
-  './plugins/core/formatters',
-  './plugins/core/events',
-  './plugins/core/patches',
-  './api',
-  './transaction-manager',
-  './undo-manager',
-  './event-emitter',
-  './node',
+  './scribe/plugins/core/plugins',
+  './scribe/plugins/core/commands',
+  './scribe/plugins/core/formatters',
+  './scribe/plugins/core/events',
+  './scribe/plugins/core/patches',
+  './scribe/api',
+  './scribe/transaction-manager',
+  './scribe/undo-manager',
+  './scribe/event-emitter',
+  './scribe/node',
   'immutable',
-  './config'
+  './scribe/config'
 ], function (
   plugins,
   commands,

@@ -1,0 +1,7 @@
+{
+    "compilerOptions": {
+        "module": "amd",
+        "sourceMap": true,
+        "outFile": "../dist/scribe.js"
+    }
+}
