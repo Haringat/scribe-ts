@@ -1,25 +1,35 @@
-  export = function () {
-    return function (scribe) {
-      var redoCommand = new scribe.api.Command('redo');
+import { Scribe } from "../../../../scribe"
+import { Command } from "../../../api/command"
 
-      redoCommand.execute = function () {
-        scribe.undoManager.redo();
-      };
+const Z_KEY = 90
 
-      redoCommand.queryEnabled = function () {
-        return scribe.undoManager.position > 0;
-      };
+class RedoCommand extends Command {
+    constructor(scribe: Scribe) {
+        super(scribe, "redo")
 
-      scribe.commands.redo = redoCommand;
+        //is scribe is configured to undo assign listener
+        if (scribe.options.undo.enabled) {
+            // TODO keyboard shortcut handling doesn't belong here
+            scribe.el.addEventListener('keydown', (event) => {
+                if (event.shiftKey && (event.metaKey || event.ctrlKey) && event.keyCode === Z_KEY) {
+                    event.preventDefault()
+                    this.execute()
+                }
+            })
+        }
+    }
 
-      //is scribe is configured to undo assign listener
-      if (scribe.options.undo.enabled) {
-        scribe.el.addEventListener('keydown', function (event) {
-          if (event.shiftKey && (event.metaKey || event.ctrlKey) && event.keyCode === 90) {
-            event.preventDefault();
-            redoCommand.execute();
-          }
-        });
-      }
-    };
-  };
+    execute() {
+        this.scribe.undoManager.redo()
+    }
+
+    queryEnabled() {
+        return this.scribe.undoManager.position > 0
+    }
+}
+
+export = function() {
+    return function(scribe: Scribe) {
+        scribe.commands["redo"] = new RedoCommand(scribe)
+    }
+}

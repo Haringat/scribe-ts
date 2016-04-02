@@ -6,22 +6,22 @@ import outdent = require("./patches/commands/outdent")
 import createLink = require("./patches/commands/create-link")
 import events = require("./patches/events")
 
-  /**
-   * Command patches browser inconsistencies. They do not perform core features
-   * of the editor, such as ensuring P elements are created when
-   * applying/unapplying commands — that is the job of the core commands.
-   */
+/**
+ * Command patches browser inconsistencies. They do not perform core features
+ * of the editor, such as ensuring P elements are created when
+ * applying/unapplying commands — that is the job of the core commands.
+ */
 
-  var patches = {
+var patches = {
     commands: {
-      bold,
-      indent,
-      insertHTML,
-      insertList,
-      outdent,
-      createLink,
+        bold,
+        indent,
+        insertHTML,
+        insertList,
+        outdent,
+        createLink,
     },
     events
-  };
+};
 
 export = patches

@@ -1,38 +1,40 @@
-import * as assign from 'lodash-amd/modern/object/assign'
+import { Scribe } from "../scribe"
 
-  export = function (scribe) {
-    function TransactionManager() {
-      this.history = [];
+export class TransactionManager {
+
+    history = []
+
+    private scribe: Scribe
+
+    constructor(scribe: Scribe) {
+        this.scribe = scribe
     }
 
-    assign(TransactionManager.prototype, {
-      start: function () {
-        this.history.push(1);
-      },
 
-      end: function () {
-        this.history.pop();
+    start() {
+        this.history.push(1)
+    }
+
+    end() {
+        this.history.pop()
 
         if (this.history.length === 0) {
-          scribe.pushHistory();
-          scribe.trigger('content-changed');
+            this.scribe.pushHistory()
+            this.scribe.trigger('content-changed')
         }
-      },
+    }
 
-      run: function (transaction, forceMerge) {
+    run(transaction: Function, forceMerge?: boolean) {
         this.start();
         // If there is an error, don't prevent the transaction from ending.
         try {
-          if (transaction) {
-            transaction();
-          }
+            if (transaction) {
+                transaction();
+            }
         } finally {
-          scribe._forceMerge = forceMerge === true;
-          this.end();
-          scribe._forceMerge = false;
+            this.scribe._forceMerge = forceMerge === true;
+            this.end();
+            this.scribe._forceMerge = false;
         }
-      }
-    });
-
-    return TransactionManager;
-  };
+    }
+}

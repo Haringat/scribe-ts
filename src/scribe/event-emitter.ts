@@ -1,40 +1,49 @@
-import Immutable = require("immutable")
+import { removeValue } from "./util"
 
-  // TODO: once
-  // TODO: unit test
-  // Good example of a complete(?) implementation: https://github.com/Wolfy87/EventEmitter
-  function EventEmitter() {
-    this._listeners = {};
-  }
+// TODO: once
+// TODO: unit test
+// Good example of a complete(?) implementation: https://github.com/Wolfy87/EventEmitter
 
-  EventEmitter.prototype.on = function (eventName, fn) {
-    var listeners = this._listeners[eventName] || Immutable.Set();
+export = class EventEmitter {
 
-    this._listeners[eventName] = listeners.add(fn);
-  };
+    private _listeners: { [name: string]: Function[] }
 
-  EventEmitter.prototype.off = function (eventName, fn) {
-    var listeners = this._listeners[eventName] || Immutable.Set();
-    if (fn) {
-      this._listeners[eventName] = listeners.delete(fn);
-    } else {
-      this._listeners[eventName] = listeners.clear();
+    constructor() {
+        this._listeners = {}
     }
-  };
 
-  EventEmitter.prototype.trigger = function (eventName, args) {
+    on(name: string, listener: Function) {
+        if (!this._listeners[name]) {
+            this._listeners[name] = []
+        }
 
-    //fire events like my:custom:event -> my:custom -> my
-    var events = eventName.split(':');
-    while(!!events.length){
-      var currentEvent = events.join(':');
-      var listeners = this._listeners[currentEvent] || Immutable.Set();
-      //trigger handles
-      listeners.forEach(function (listener) {
-        listener.apply(null, args);
-      });
-      events.splice((events.length - 1), 1);
+        this._listeners[name].push(listener)
     }
-  };
 
-  export = EventEmitter;
+    off(name: string, listener?: Function) {
+        if (listener) {
+            removeValue(this._listeners[name], listener)
+        } else {
+            this._listeners[name] = []
+        }
+    }
+
+    trigger(name: string, args: any[] = []) {
+        // fire events like "my:custom:event", then "my:custom", then "my"
+        
+        var events = name.split(":")
+
+        while (events.length > 0) {
+            var current = events.join(":")
+
+            var listeners = this._listeners[current]
+
+            if (listeners) {
+                // trigger handlers:
+                listeners.forEach((listener) => listener.apply(null, args))
+            }
+
+            events.pop()
+        }
+    }
+}

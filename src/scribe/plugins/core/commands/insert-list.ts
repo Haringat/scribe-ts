@@ -1,127 +1,124 @@
-import Immutable = require("immutable")
+import { Scribe } from "../../../../scribe"
+import { Command } from "../../../api/command"
+import * as nodeHelpers from "../../../node"
+import { toArray } from "../../../util"
 
-  /**
-   * If the paragraphs option is set to true, then when the list is
-   * unapplied, ensure that we enter a P element.
-   */
+/**
+ * If the paragraphs option is set to true, then when the list is
+ * unapplied, ensure that we enter a P element.
+ */
 
-  export = function () {
-    return function (scribe) {
-      var nodeHelpers = scribe.node;
+class InsertListCommand extends Command {
+    execute(value) {
+        function splitList(listItemElements: HTMLElement[]) {
+            // TODO fix horrible scoping of listNode (defined below!)
+            if (!!listItemElements.length) {
+                var newListNode = document.createElement(listNode.nodeName) as HTMLElement
 
-      var InsertListCommand = function (commandName) {
-        scribe.api.Command.call(this, commandName);
-      };
+                while (listItemElements.length > 0) {
+                    newListNode.appendChild(listItemElements[0])
+                    listItemElements.shift()
+                }
 
-      InsertListCommand.prototype = Object.create(scribe.api.Command.prototype);
-      InsertListCommand.prototype.constructor = InsertListCommand;
-
-      InsertListCommand.prototype.execute = function (value) {
-        function splitList(listItemElements) {
-          if (!!listItemElements.size) {
-            var newListNode = document.createElement(listNode.nodeName);
-
-            while (!!listItemElements.size) {
-              newListNode.appendChild(listItemElements.first());
-              listItemElements = listItemElements.shift();
+                listNode.parentNode.insertBefore(newListNode, listNode.nextElementSibling)
             }
-
-            listNode.parentNode.insertBefore(newListNode, listNode.nextElementSibling);
-          }
         }
 
         if (this.queryState()) {
-          var selection = new scribe.api.Selection();
-          var range = selection.range;
+            var selection = new this.scribe.api.Selection()
+            var range = selection.range
 
-          var listNode = selection.getContaining(function (node) {
-            return node.nodeName === 'OL' || node.nodeName === 'UL';
-          });
+            var listNode = selection.getContaining((node) => node.nodeName === 'OL' || node.nodeName === 'UL') as HTMLElement
 
-          var listItemElement = selection.getContaining(function (node) {
-            return node.nodeName === 'LI';
-          });
+            var listItemElement = selection.getContaining((node) => node.nodeName === 'LI') as HTMLElement
 
-          scribe.transactionManager.run(function () {
-            if (listItemElement) {
-              var nextListItemElements = nodeHelpers.nextSiblings(listItemElement);
+            this.scribe.transactionManager.run(function() {
+                if (listItemElement) {
+                    var nextListItemElements = nodeHelpers.nextSiblings(listItemElement) as HTMLElement[]
 
-              /**
-               * If we are not at the start or end of a UL/OL, we have to
-               * split the node and insert the P(s) in the middle.
-               */
-              splitList(nextListItemElements);
+                    /**
+                     * If we are not at the start or end of a UL/OL, we have to
+                     * split the node and insert the P(s) in the middle.
+                     */
+                    splitList(nextListItemElements)
 
-              /**
-               * Insert a paragraph in place of the list item.
-               */
+                    /**
+                     * Insert a paragraph in place of the list item.
+                     */
 
-              selection.placeMarkers();
+                    selection.placeMarkers();
 
-              var pNode = document.createElement('p');
-              pNode.innerHTML = listItemElement.innerHTML;
+                    var pNode = document.createElement('p');
+                    pNode.innerHTML = listItemElement.innerHTML;
 
-              listNode.parentNode.insertBefore(pNode, listNode.nextElementSibling);
-              listItemElement.parentNode.removeChild(listItemElement);
-            } else {
-              /**
-               * When multiple list items are selected, we replace each list
-               * item with a paragraph.
-               */
+                    listNode.parentNode.insertBefore(pNode, listNode.nextElementSibling);
+                    listItemElement.parentNode.removeChild(listItemElement);
+                } else {
+                    /**
+                     * When multiple list items are selected, we replace each list
+                     * item with a paragraph.
+                     */
 
-              // We can't query for list items in the selection so we loop
-              // through them all and find the intersection ourselves.
-              var selectedListItemElements = Immutable.List(listNode.querySelectorAll('li'))
-                .filter(function (listItemElement) {
-                  return range.intersectsNode(listItemElement);
-                });
-              var lastSelectedListItemElement = selectedListItemElements.last();
-              var listItemElementsAfterSelection = nodeHelpers.nextSiblings(lastSelectedListItemElement);
+                    // We can't query for list items in the selection so we loop
+                    // through them all and find the intersection ourselves.
+                    var selectedListItemElements = toArray(listNode.querySelectorAll('li'))
+                        .filter((listItemElement) => {
+                            // TODO Range.intersectsNode() is experimental
+                            // https://dom.spec.whatwg.org/#dom-range-intersectsnode
+                            // maybe derive a polyfill from rangy?
+                            // https://github.com/timdown/rangy/blob/1e55169d2e4d1d9458c2a87119addf47a8265276/src/core/domrange.js#L696
+                            return range.intersectsNode(listItemElement)
+                        });
+                    var lastSelectedListItemElement = selectedListItemElements[selectedListItemElements.length - 1]
+                    var listItemElementsAfterSelection = nodeHelpers.nextSiblings(lastSelectedListItemElement) as HTMLElement[]
 
-              /**
-               * If we are not at the start or end of a UL/OL, we have to
-               * split the node and insert the P(s) in the middle.
-               */
-              splitList(listItemElementsAfterSelection);
+                    /**
+                     * If we are not at the start or end of a UL/OL, we have to
+                     * split the node and insert the P(s) in the middle.
+                     */
+                    splitList(listItemElementsAfterSelection)
 
-              // Store the caret/range positioning inside of the list items so
-              // we can restore it from the newly created P elements soon
-              // afterwards.
-              selection.placeMarkers();
+                    // Store the caret/range positioning inside of the list items so
+                    // we can restore it from the newly created P elements soon
+                    // afterwards.
+                    selection.placeMarkers()
 
-              var documentFragment = document.createDocumentFragment();
-              selectedListItemElements.forEach(function (listItemElement) {
-                var pElement = document.createElement('p');
-                pElement.innerHTML = listItemElement.innerHTML;
-                documentFragment.appendChild(pElement);
-              });
+                    var documentFragment = document.createDocumentFragment()
+                    selectedListItemElements.forEach(function(listItemElement) {
+                        var pElement = document.createElement('p')
+                        pElement.innerHTML = listItemElement.innerHTML
+                        documentFragment.appendChild(pElement)
+                    })
 
-              // Insert the Ps
-              listNode.parentNode.insertBefore(documentFragment, listNode.nextElementSibling);
+                    // Insert the Ps
+                    listNode.parentNode.insertBefore(documentFragment, listNode.nextElementSibling)
 
-              // Remove the LIs
-              selectedListItemElements.forEach(function (listItemElement) {
-                listItemElement.parentNode.removeChild(listItemElement);
-              });
-            }
+                    // Remove the LIs
+                    selectedListItemElements.forEach(function(listItemElement) {
+                        listItemElement.parentNode.removeChild(listItemElement)
+                    })
+                }
 
-            // If the list is now empty, clean it up.
-            if (listNode.childNodes.length === 0) {
-              listNode.parentNode.removeChild(listNode);
-            }
+                // If the list is now empty, clean it up.
+                if (listNode.childNodes.length === 0) {
+                    listNode.parentNode.removeChild(listNode)
+                }
 
-            selection.selectMarkers();
-          }.bind(this));
+                selection.selectMarkers()
+            })
         } else {
-          scribe.api.Command.prototype.execute.call(this, value);
+            super.execute(value)
         }
-      };
+    }
+    
+    queryEnabled() {
+        return super.queryEnabled() && this.scribe.allowsBlockElements()
+    }
+}
 
-      InsertListCommand.prototype.queryEnabled = function () {
-        return scribe.api.Command.prototype.queryEnabled.call(this) && scribe.allowsBlockElements();
-      };
-
-      scribe.commands.insertOrderedList = new InsertListCommand('insertOrderedList');
-      scribe.commands.insertUnorderedList = new InsertListCommand('insertUnorderedList');
-    };
-  };
+export = function() {
+    return function(scribe: Scribe) {
+        scribe.commands["insertOrderedList"] = new InsertListCommand(scribe, 'insertOrderedList')
+        scribe.commands["insertUnorderedList"] = new InsertListCommand(scribe, 'insertUnorderedList')
+    }
+}

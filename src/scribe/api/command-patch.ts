@@ -1,21 +1,26 @@
-  export = function (scribe) {
-    function CommandPatch(commandName) {
-      this.commandName = commandName;
+import { Scribe } from "../scribe"
+
+export class CommandPatch {
+
+    scribe: Scribe
+
+    commandName: string
+
+    constructor(scribe: Scribe, commandName: string) {
+        this.commandName = commandName
     }
 
-    CommandPatch.prototype.execute = function (value) {
-      scribe.transactionManager.run(function () {
-        document.execCommand(this.commandName, false, value || null);
-      }.bind(this));
-    };
+    execute(value) {
+        this.scribe.transactionManager.run(() => {
+            document.execCommand(this.commandName, false, value || null)
+        })
+    }
 
-    CommandPatch.prototype.queryState = function () {
-      return document.queryCommandState(this.commandName);
-    };
+    queryState() {
+        return document.queryCommandState(this.commandName)
+    }
 
-    CommandPatch.prototype.queryEnabled = function () {
-      return document.queryCommandEnabled(this.commandName);
-    };
-
-    return CommandPatch;
-  };
+    queryEnabled() {
+        return document.queryCommandEnabled(this.commandName)
+    }
+}

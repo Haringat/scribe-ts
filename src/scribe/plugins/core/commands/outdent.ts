@@ -1,23 +1,28 @@
-  export = function () {
-    return function (scribe) {
-      var outdentCommand = new scribe.api.Command('outdent');
+import { Scribe } from "../../../../scribe"
+import { Command } from "../../../api/command"
 
-      outdentCommand.queryEnabled = function () {
+class OutdentCommand extends Command {
+    constructor(scribe: Scribe) {
+        super(scribe, "outdent")
+    }
+
+    queryEnabled() {
         /**
          * FIXME: If the paragraphs option is set to true, then when the
          * list is unapplied, ensure that we enter a P element.
          * Currently we just disable the command when the selection is inside of
          * a list.
          */
-        var selection = new scribe.api.Selection();
-        var listElement = selection.getContaining(function (element) {
-          return element.nodeName === 'UL' || element.nodeName === 'OL';
-        });
+        var selection = new this.scribe.api.Selection()
+        var listElement = selection.getContaining((element) => element.nodeName === 'UL' || element.nodeName === 'OL')
 
         // FIXME: define block element rule here?
-        return scribe.api.Command.prototype.queryEnabled.call(this) && scribe.allowsBlockElements() && ! listElement;
-      };
+        return super.queryEnabled() && this.scribe.allowsBlockElements() && !listElement
+    }
+}
 
-      scribe.commands.outdent = outdentCommand;
-    };
-  };
+export = function() {
+    return function(scribe: Scribe) {
+        scribe.commands["outdent"] = new OutdentCommand(scribe)
+    }
+}

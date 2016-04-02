@@ -1,25 +1,34 @@
-  export = function () {
-    return function (scribe) {
-      var undoCommand = new scribe.api.Command('undo');
+import { Scribe } from "../../../../scribe"
+import { Command } from "../../../api/command"
 
-      undoCommand.execute = function () {
-        scribe.undoManager.undo();
-      };
+const Z_KEY = 90
 
-      undoCommand.queryEnabled = function () {
-        return scribe.undoManager.position < scribe.undoManager.length;
-      };
+class UndoCommand extends Command {
+    constructor(scribe: Scribe) {
+        super(scribe, "undo")
 
-      scribe.commands.undo = undoCommand;
+        if (scribe.options.undo.enabled) {
+            scribe.el.addEventListener('keydown', (event) => {
+                // TODO keyboard shortcut handling really doesn't belong here
+                if (!event.shiftKey && (event.metaKey || event.ctrlKey) && event.keyCode === Z_KEY) {
+                    event.preventDefault()
+                    this.execute()
+                }
+            })
+        }
+    }
 
-      if (scribe.options.undo.enabled) {
-        scribe.el.addEventListener('keydown', function (event) {
-          // TODO: use lib to abstract meta/ctrl keys?
-          if (! event.shiftKey && (event.metaKey || event.ctrlKey) && event.keyCode === 90) {
-            event.preventDefault();
-            undoCommand.execute();
-          }
-        });
-      }
-    };
-  };
+    execute() {
+        this.scribe.undoManager.undo();
+    }
+
+    queryEnabled() {
+        return this.scribe.undoManager.position < this.scribe.undoManager.length
+    }
+}
+
+export = function() {
+    return function(scribe) {
+        scribe.commands["undo"] = new UndoCommand(scribe)
+    }
+}

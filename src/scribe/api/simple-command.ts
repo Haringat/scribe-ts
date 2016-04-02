@@ -1,19 +1,22 @@
-  export = function (api, scribe) {
-    function SimpleCommand(commandName, nodeName) {
-      scribe.api.Command.call(this, commandName);
+import { Scribe } from "../scribe"
+import { Command } from "./command"
 
-      this._nodeName = nodeName;
+export class SimpleCommand extends Command {
+
+    private _nodeName: string
+
+    constructor(scribe: Scribe, commandName: string, nodeName: string) {
+        super(scribe, commandName)
+
+        this._nodeName = nodeName
     }
 
-    SimpleCommand.prototype = Object.create(api.Command.prototype);
-    SimpleCommand.prototype.constructor = SimpleCommand;
+    queryState() {
+        var selection = new this.scribe.api.Selection()
+        
+        return super.queryState() && !!selection.getContaining((node) => {
+            return node.nodeName === this._nodeName
+        })
+    }
 
-    SimpleCommand.prototype.queryState = function () {
-      var selection = new scribe.api.Selection();
-      return scribe.api.Command.prototype.queryState.call(this) && !! selection.getContaining(function (node) {
-        return node.nodeName === this._nodeName;
-      }.bind(this));
-    };
-
-    return SimpleCommand;
-  };
+}

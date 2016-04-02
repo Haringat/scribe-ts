@@ -1,34 +1,41 @@
-  export = function (scribe) {
-    function Command(commandName) {
-      this.commandName = commandName;
-      this.patch = scribe.commandPatches[this.commandName];
+import { Scribe } from "../scribe"
+
+export class Command {
+
+    protected scribe: Scribe
+
+    commandName: string
+    patch: Command
+
+    constructor(scribe: Scribe, commandName: string) {
+        this.scribe = scribe
+        this.commandName = commandName
+        this.patch = scribe.commandPatches[this.commandName]
     }
 
-    Command.prototype.execute = function (value) {
-      if (this.patch) {
-        this.patch.execute(value);
-      } else {
-        scribe.transactionManager.run(function () {
-          document.execCommand(this.commandName, false, value || null);
-        }.bind(this));
-      }
-    };
+    execute(value?): void {
+        if (this.patch) {
+            this.patch.execute(value)
+        } else {
+            this.scribe.transactionManager.run(() => {
+                document.execCommand(this.commandName, false, value || null)
+            })
+        }
+    }
 
-    Command.prototype.queryState = function () {
-      if (this.patch) {
-        return this.patch.queryState();
-      } else {
-        return document.queryCommandState(this.commandName);
-      }
-    };
+    queryState(): boolean {
+        if (this.patch) {
+            return this.patch.queryState()
+        } else {
+            return document.queryCommandState(this.commandName)
+        }
+    }
 
-    Command.prototype.queryEnabled = function () {
-      if (this.patch) {
-        return this.patch.queryEnabled();
-      } else {
-        return document.queryCommandEnabled(this.commandName);
-      }
-    };
-
-    return Command;
-  };
+    queryEnabled(): boolean {
+        if (this.patch) {
+            return this.patch.queryEnabled()
+        } else {
+            return document.queryCommandEnabled(this.commandName)
+        }
+    }
+}

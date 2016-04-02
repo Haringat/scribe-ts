@@ -1,177 +1,173 @@
-import inlineElementNames = require("./constants/inline-element-names")
-import blockElementNames = require("./constants/block-element-names")
-import Immutable = require("immutable")
+import { blockElementNames, inlineElementNames } from "./constants"
+import { toArray } from "./util"
 
-  function isBlockElement(node) {
-    return blockElementNames.includes(node.nodeName);
-  }
+const inlineElementSelector = inlineElementNames
+    .map(elName => elName + '[style*="line-height"]')
+    .join(',')
 
-  function isInlineElement(node) {
-    return inlineElementNames.includes(node.nodeName);
-  }
+export function isBlockElement(node: Node): node is Element {
+    return blockElementNames.indexOf(node.nodeName) !== -1
+}
 
-  // return true if nested inline tags ultimately just contain <br> or ""
-  function isEmptyInlineElement(node) {
-    if( node.children.length > 1 ) return false;
-    if( node.children.length === 1 && node.textContent.trim() !== '' ) return false;
-    if( node.children.length === 0 ) return node.textContent.trim() === '';
-    return isEmptyInlineElement(node.children[0]);
-  }
+export function isInlineElement(node: Node): node is Element {
+    return inlineElementNames.indexOf(node.nodeName) !== -1
+}
 
-  function isText(node) {
-    return node.nodeType === Node.TEXT_NODE;
-  }
+export function isHTMLElement(node: Node): node is HTMLElement {
+    return node.nodeType === Node.ELEMENT_NODE
+}
 
-  function isEmptyTextNode(node) {
-    return isText(node) && node.data === '';
-  }
+/// return true if nested inline tags ultimately just contain <br> or ""
+export function isEmptyInlineElement(node: Node): boolean {
+    if (isHTMLElement(node)) {
+        if (node.children.length > 1) {
+            return false
+        }
 
-  function isFragment(node) {
-    return node.nodeType === Node.DOCUMENT_FRAGMENT_NODE;
-  }
+        if (node.children.length === 1 && node.textContent.trim() !== "") {
+            return false
+        }
 
-  function isBefore(node1, node2) {
-    return node1.compareDocumentPosition(node2) & Node.DOCUMENT_POSITION_FOLLOWING;
-  }
+        if (node.children.length === 0) {
+            return node.textContent.trim() === ""
+        }
 
-  function elementHasClass(Node, className) {
-    return function(node) {
-      return (node.nodeType === Node.ELEMENT_NODE && node.className === className)
-    }
-  }
-
-  function isSelectionMarkerNode(node) {
-    return elementHasClass(Node, 'scribe-marker')(node);
-  }
-
-  function isCaretPositionNode(node) {
-    return elementHasClass(Node, 'caret-position')(node);
-  }
-
-  function isWhitespaceOnlyTextNode(Node, node) {
-    if(node.nodeType === Node.TEXT_NODE
-      && /^\s*$/.test(node.nodeValue)) {
-      return true;
+        return isEmptyInlineElement(node.children[0])
     }
 
-    return false;
+    return false
+}
 
-  }
+export function isText(node: Node): node is CharacterData {
+    return node.nodeType === Node.TEXT_NODE
+}
 
-  function firstDeepestChild(node) {
-    var fs = node.firstChild;
-    return !fs || fs.nodeName === 'BR' ?
-      node :
-      firstDeepestChild(fs);
-  }
+export function isEmptyTextNode(node: Node): boolean {
+    return isText(node) && node.data === ""
+}
 
-  function insertAfter(newNode, referenceNode) {
-    return referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
-  }
+export function isFragment(node: Node): boolean {
+    return node.nodeType === Node.DOCUMENT_FRAGMENT_NODE
+}
 
-  function removeNode(node) {
-    return node.parentNode.removeChild(node);
-  }
+export function isBefore(node1: Node, node2: Node) {
+    return node1.compareDocumentPosition(node2) & Node.DOCUMENT_POSITION_FOLLOWING
+}
 
-  function getAncestor(node, rootElement, nodeFilter) {
-    function isTopContainerElement (element) {
-      return rootElement === element;
+function elementHasClass(node: Node, className: string): boolean {
+    return isHTMLElement(node) && node.className === className
+}
+
+export function isSelectionMarkerNode(node: Node): node is HTMLElement {
+    return elementHasClass(node, "scribe-marker")
+}
+
+export function isCaretPositionNode(node: Node): node is HTMLElement {
+    return elementHasClass(node, "caret-position")
+}
+
+export function firstDeepestChild(node: Node): Node {
+    var fs = node.firstChild
+
+    return !fs || fs.nodeName === "BR"
+        ? node
+        : firstDeepestChild(fs)
+}
+
+export function insertAfter(newNode: Node, referenceNode: Node): Node {
+    return referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling)
+}
+
+export function removeNode(node: Node): Node {
+    return node.parentNode.removeChild(node)
+}
+
+type NodeFilter = { (node: Node): boolean }
+
+export function getAncestor(node: Node, rootElement: Node, nodeFilter: NodeFilter): Node {
+    function isTopContainerElement(element: Node) {
+        return rootElement === element
     }
     // TODO: should this happen here?
     if (isTopContainerElement(node)) {
-      return;
+        return
     }
 
-    var currentNode = node.parentNode;
+    var currentNode = node.parentNode
 
     // If it's a `contenteditable` then it's likely going to be the Scribe
     // instance, so stop traversing there.
-    while (currentNode && ! isTopContainerElement(currentNode)) {
-      if (nodeFilter(currentNode)) {
-        return currentNode;
-      }
-      currentNode = currentNode.parentNode;
-    }
-  }
+    while (currentNode && !isTopContainerElement(currentNode)) {
+        if (nodeFilter(currentNode)) {
+            return currentNode
+        }
 
-  function nextSiblings(node) {
-    var all = Immutable.List();
+        currentNode = currentNode.parentNode
+    }
+}
+
+export function nextSiblings(node: Node): Node[] {
+    var all: Node[] = []
+
     while (node = node.nextSibling) {
-      all = all.push(node);
+        all.push(node)
     }
-    return all;
-  }
 
-  function wrap(nodes, parentNode) {
-    nodes[0].parentNode.insertBefore(parentNode, nodes[0]);
-    nodes.forEach(function (node) {
-      parentNode.appendChild(node);
-    });
-    return parentNode;
-  }
+    return all
+}
 
-  function unwrap(node, childNode) {
+export function wrap(nodes: Node[], parentNode: Node): Node {
+    nodes[0].parentNode.insertBefore(parentNode, nodes[0])
+
+    for (var i = 0; i < nodes.length; i++) {
+        parentNode.appendChild(nodes[i]);
+    }
+
+    return parentNode
+}
+
+export function unwrap(node: Node, childNode: Node) {
     while (childNode.childNodes.length > 0) {
-      node.insertBefore(childNode.childNodes[0], childNode);
-    }
-    node.removeChild(childNode);
-  }
-
-  /**
-   * Chrome: If a parent node has a CSS `line-height` when we apply the
-   * insertHTML command, Chrome appends a SPAN to plain content with
-   * inline styling replicating that `line-height`, and adjusts the
-   * `line-height` on inline elements.
-   *
-   * As per: http://jsbin.com/ilEmudi/4/edit?css,js,output
-   * More from the web: http://stackoverflow.com/q/15015019/40352
-   */
-  function removeChromeArtifacts(parentElement) {
-    function isInlineWithStyle(parentStyle, element) {
-      return window.getComputedStyle(element).lineHeight === parentStyle.lineHeight;
+        node.insertBefore(childNode.childNodes[0], childNode)
     }
 
-    var nodes = Immutable.List(parentElement.querySelectorAll(inlineElementNames
-      .map(function(elName) { return elName + '[style*="line-height"]' })
-      .join(',')
-      ));
-    nodes = nodes.filter(isInlineWithStyle.bind(null, window.getComputedStyle(parentElement)));
+    node.removeChild(childNode)
+}
 
-    var emptySpans = Immutable.List();
+/**
+ * Chrome: If a parent node has a CSS `line-height` when we apply the
+ * insertHTML command, Chrome appends a SPAN to plain content with
+ * inline styling replicating that `line-height`, and adjusts the
+ * `line-height` on inline elements.
+ *
+ * As per: http://jsbin.com/ilEmudi/4/edit?css,js,output
+ * More from the web: http://stackoverflow.com/q/15015019/40352
+ */
+export function removeChromeArtifacts(parentElement: Node) {
+    if (isHTMLElement(parentElement)) {
+        var nodes = toArray(parentElement.querySelectorAll(inlineElementSelector) as NodeListOf<HTMLElement>)
+            .filter(el => isInlineWithStyle(window.getComputedStyle(parentElement), el))
 
-    nodes.forEach(function(node) {
-      node.style.lineHeight = null;
-      if (node.getAttribute('style') === '') {
-        node.removeAttribute('style');
-      }
-      if (node.nodeName === 'SPAN' && node.attributes.length === 0) {
-        emptySpans = emptySpans.push(node);
-      }
-    });
+        var emptySpans: Node[] = []
 
-    emptySpans.forEach(function(node) {
-      unwrap(node.parentNode, node);
-    });
-  }
+        for (let node of nodes) {
+            node.style.lineHeight = null
 
-  export = {
-    isInlineElement: isInlineElement,
-    isBlockElement: isBlockElement,
-    isEmptyInlineElement: isEmptyInlineElement,
-    isText: isText,
-    isEmptyTextNode: isEmptyTextNode,
-    isWhitespaceOnlyTextNode: isWhitespaceOnlyTextNode,
-    isFragment: isFragment,
-    isBefore: isBefore,
-    isSelectionMarkerNode: isSelectionMarkerNode,
-    isCaretPositionNode: isCaretPositionNode,
-    firstDeepestChild: firstDeepestChild,
-    insertAfter: insertAfter,
-    removeNode: removeNode,
-    getAncestor: getAncestor,
-    nextSiblings: nextSiblings,
-    wrap: wrap,
-    unwrap: unwrap,
-    removeChromeArtifacts: removeChromeArtifacts,
-    elementHasClass: elementHasClass
-  };
+            if (!node.getAttribute("style")) {
+                node.removeAttribute("style");
+            }
+            
+            if (node.nodeName === "SPAN" && node.attributes.length === 0) {
+                emptySpans.push(node);
+            }
+        }
+        
+        for (let node of emptySpans) {
+            unwrap(node.parentNode, node);
+        }
+    }
+}
+
+function isInlineWithStyle(parentStyle: CSSStyleDeclaration, element: Element): boolean {
+    return window.getComputedStyle(element).lineHeight === parentStyle.lineHeight;
+}

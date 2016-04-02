@@ -1,7 +1,7 @@
-  export = function () {
-    return function (scribe) {
-      var subscriptCommand = new scribe.api.Command('subscript');
+import { Scribe } from "../../../../scribe"
 
-      scribe.commands.subscript = subscriptCommand;
-    };
-  };
+export = function() {
+    return function(scribe: Scribe) {
+        scribe.commands["subscript"] = new scribe.api.Command('subscript')
+    }
+}
