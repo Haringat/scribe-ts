@@ -3,6 +3,10 @@
     "compilerOptions": {
         "module": "amd",
         "sourceMap": true,
-        "outFile": "../dist/scribe.js"
-    }
+        "outFile": "../dist/scribe.js",
+        "removeComments": true
+    },
+    "exclude": [
+        
+    ]
 }
