@@ -1,4 +1,4 @@
-import { Scribe } from "../scribe"
+import { Scribe } from "../../scribe"
 import { Command } from "./command"
 
 export class SimpleCommand extends Command {

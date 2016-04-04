@@ -1,17 +1,29 @@
-import { Scribe } from "../scribe"
+import { Scribe } from "../../scribe"
+import { CommandPatch } from "./command-patch"
 
-export class Command {
+export interface CommandInterface {
+    event: Event // TODO necessary? only for some third-party plug-in, reportedly    
+    commandName: string
+
+    execute(value?): void
+    queryState(): boolean
+    queryEnabled(): boolean
+}
+
+export class Command implements CommandInterface {
 
     protected scribe: Scribe
 
     commandName: string
-    patch: Command
     event: Event // TODO necessary? only for some third-party plug-in, reportedly
 
     constructor(scribe: Scribe, commandName: string) {
         this.scribe = scribe
         this.commandName = commandName
-        this.patch = scribe.commandPatches[this.commandName]
+    }
+
+    get patch(): CommandPatch {
+        return this.scribe.commandPatches[this.commandName]
     }
 
     execute(value?): void {

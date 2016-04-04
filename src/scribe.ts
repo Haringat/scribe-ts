@@ -10,7 +10,7 @@ import EventEmitter = require("./scribe/event-emitter")
 import * as nodeHelpers from "./scribe/node"
 import Immutable = require("immutable")
 import * as config from "./scribe/config"
-import { Command } from "./scribe/api/command"
+import { CommandInterface } from "./scribe/api/command"
 import { CommandPatch } from "./scribe/api/command-patch"
 
 export interface Options {
@@ -22,6 +22,9 @@ export interface Options {
         enabled?: boolean
         manager?: UndoManager
     }
+    defaultPlugins: string[]
+    defaultFormatters: string[]
+    defaultCommandPatches: string[]
 }
 
 export interface ScribePlugin {
@@ -38,7 +41,7 @@ export class Scribe extends EventEmitter {
     static element = Scribe.node // TODO eliminate duplicate
 
     el: HTMLElement
-    commands: { [name: string]: Command } = {}
+    commands: { [name: string]: CommandInterface } = {}
     commandPatches: { [name: string]: CommandPatch } = {}
     api: ScribeApi
     options: Options
@@ -105,7 +108,7 @@ export class Scribe extends EventEmitter {
 
         var defaultCommandPatches = Immutable.List(options.defaultCommandPatches).map(function(patch) { return patches.commands[patch]; });
 
-        var defaultCommands: Command[] = ([
+        var defaultCommands: CommandInterface[] = ([
             'indent',
             'insertList',
             'outdent',
@@ -137,7 +140,7 @@ export class Scribe extends EventEmitter {
     }
 
     setHTML(html: string, skipFormatters: boolean = false) {
-        if (this.undoManager) {
+        if (this.options.undo.enabled) {
             this._lastItem.content = html;
         }
 
@@ -170,7 +173,7 @@ export class Scribe extends EventEmitter {
          * This happens when doing any DOM manipulation.
          */
 
-        if (this.undoManager) {
+        if (this.options.undo.enabled) {
             // Get scribe previous content, and strip markers.
             var lastContentNoMarkers = this._lastItem.content.replace(/<em [^>]*class="scribe-marker"[^>]*>[^<]*?<\/em>/g, '')
 
@@ -217,7 +220,7 @@ export class Scribe extends EventEmitter {
         return false
     }
 
-    getCommand(commandName: string): Command {
+    getCommand(commandName: string): CommandInterface {
         return this.commands[commandName] || this.commandPatches[commandName] || new this.api.Command(commandName)
     }
 

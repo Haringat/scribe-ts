@@ -1,10 +1,16 @@
-import { Scribe } from "../scribe"
-import { Command } from "./command"
+import { Scribe } from "../../scribe"
+import { CommandInterface } from "./command"
 
-export class CommandPatch extends Command {
+export class CommandPatch implements CommandInterface {
+    
+    protected scribe: Scribe
+    
+    event: Event
+    commandName: string
     
     constructor(scribe: Scribe, commandName: string) {
-        super(scribe, commandName)
+        this.scribe = scribe
+        this.commandName = commandName
     }
 
     execute(value?) {
@@ -19,6 +25,5 @@ export class CommandPatch extends Command {
 
     queryEnabled() {
         return document.queryCommandEnabled(this.commandName)
-    }
-    
+    }    
 }
