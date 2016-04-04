@@ -1,4 +1,4 @@
-import { Scribe } from "../scribe"
+import { Scribe } from "../../scribe"
 import * as nodeHelpers from "../node"
 
 function createMarker(): HTMLElement {

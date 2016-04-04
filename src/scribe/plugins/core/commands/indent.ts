@@ -20,8 +20,6 @@ class IndentCommand extends Command {
     }
 }
 
-export = function() {
-    return function(scribe: Scribe) {
-        scribe.commands["indent"] = new IndentCommand(scribe)
-    }
+export = function(scribe: Scribe) {
+    scribe.commands["indent"] = new IndentCommand(scribe)
 }

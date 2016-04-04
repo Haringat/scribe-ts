@@ -17,36 +17,34 @@ import * as nodeHelpers from "../../../../node"
  * that we do not end up in a pristine state.
  */
 
-export = function() {
-    return function(scribe: Scribe) {
-        // Traverse the tree, wrapping child nodes as we go.
-        function traverse(parentNode) {
-            var i = 0, node
+export = function(scribe: Scribe) {
+    // Traverse the tree, wrapping child nodes as we go.
+    function traverse(parentNode) {
+        var i = 0, node
 
-            while (node = parentNode.children[i++]) {
-                if (node.tagName === 'BLOCKQUOTE') {
-                    nodeHelpers.wrapChildNodes(node)
-                }
+        while (node = parentNode.children[i++]) {
+            if (node.tagName === 'BLOCKQUOTE') {
+                nodeHelpers.wrapChildNodes(node)
             }
         }
-
-        scribe.registerHTMLFormatter('normalize', function(html) {
-            /**
-             * Ensure P mode.
-             *
-             * Wrap any orphan text nodes in a P element.
-             */
-            // TODO: This should be configurable and also correct markup such as
-            // `<ul>1</ul>` to <ul><li>2</li></ul>`. See skipped tests.
-            // TODO: This should probably be a part of HTML Janitor, or some other
-            // formatter.
-            var bin = document.createElement('div')
-            bin.innerHTML = html
-
-            nodeHelpers.wrapChildNodes(bin)
-            traverse(bin)
-
-            return bin.innerHTML
-        })
     }
+
+    scribe.registerHTMLFormatter('normalize', function(html) {
+        /**
+         * Ensure P mode.
+         *
+         * Wrap any orphan text nodes in a P element.
+         */
+        // TODO: This should be configurable and also correct markup such as
+        // `<ul>1</ul>` to <ul><li>2</li></ul>`. See skipped tests.
+        // TODO: This should probably be a part of HTML Janitor, or some other
+        // formatter.
+        var bin = document.createElement('div')
+        bin.innerHTML = html
+
+        nodeHelpers.wrapChildNodes(bin)
+        traverse(bin)
+
+        return bin.innerHTML
+    })
 }

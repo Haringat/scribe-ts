@@ -74,9 +74,7 @@ class InsertListCommandPatch extends CommandPatch {
     }
 }
 
-export = function() {
-    return function(scribe: Scribe) {
-        scribe.commandPatches["insertOrderedList"] = new InsertListCommandPatch(scribe, "insertOrderedList")
-        scribe.commandPatches["insertUnorderedList"] = new InsertListCommandPatch(scribe, "insertUnorderedList")
-    }
+export = function(scribe: Scribe) {
+    scribe.commandPatches["insertOrderedList"] = new InsertListCommandPatch(scribe, "insertOrderedList")
+    scribe.commandPatches["insertUnorderedList"] = new InsertListCommandPatch(scribe, "insertUnorderedList")
 }

@@ -15,8 +15,6 @@ class InsertHTMLCommand extends CommandPatch {
     }
 }
 
-export = function() {
-    return function(scribe: Scribe) {
-        scribe.commandPatches["insertHTML"] = new InsertHTMLCommand(scribe)
-    }
+export = function(scribe: Scribe) {
+    scribe.commandPatches["insertHTML"] = new InsertHTMLCommand(scribe)
 }

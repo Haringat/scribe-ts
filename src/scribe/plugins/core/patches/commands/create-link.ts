@@ -34,8 +34,6 @@ class CreateLinkCommand extends CommandPatch {
     }
 }
 
-export = function() {
-    return function(scribe) {
-        scribe.commandPatches["createLink"] = new CreateLinkCommand(scribe)
-    }
+export = function(scribe: Scribe) {
+    scribe.commandPatches["createLink"] = new CreateLinkCommand(scribe)
 }

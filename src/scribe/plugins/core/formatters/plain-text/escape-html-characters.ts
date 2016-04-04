@@ -19,8 +19,6 @@ function escapeHTML(text: string) {
     return (text == null ? "" : "" + text).replace(REGEX, escape)
 }
 
-export = function() {
-    return function(scribe: Scribe) {
-        scribe.registerPlainTextFormatter(escapeHTML)
-    }
+export = function(scribe: Scribe) {
+    scribe.registerPlainTextFormatter(escapeHTML)
 }

@@ -28,8 +28,6 @@ class RedoCommand extends Command {
     }
 }
 
-export = function() {
-    return function(scribe: Scribe) {
-        scribe.commands["redo"] = new RedoCommand(scribe)
-    }
+export = function(scribe: Scribe) {
+    scribe.commands["redo"] = new RedoCommand(scribe)
 }

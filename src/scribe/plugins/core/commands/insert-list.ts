@@ -116,9 +116,7 @@ class InsertListCommand extends Command {
     }
 }
 
-export = function() {
-    return function(scribe: Scribe) {
-        scribe.commands["insertOrderedList"] = new InsertListCommand(scribe, 'insertOrderedList')
-        scribe.commands["insertUnorderedList"] = new InsertListCommand(scribe, 'insertUnorderedList')
-    }
+export = function(scribe: Scribe) {
+    scribe.commands["insertOrderedList"] = new InsertListCommand(scribe, 'insertOrderedList')
+    scribe.commands["insertUnorderedList"] = new InsertListCommand(scribe, 'insertUnorderedList')
 }

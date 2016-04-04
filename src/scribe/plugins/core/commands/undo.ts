@@ -27,8 +27,6 @@ class UndoCommand extends Command {
     }
 }
 
-export = function() {
-    return function(scribe) {
-        scribe.commands["undo"] = new UndoCommand(scribe)
-    }
+export = function(scribe: Scribe) {
+    scribe.commands["undo"] = new UndoCommand(scribe)
 }

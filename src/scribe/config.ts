@@ -1,4 +1,18 @@
-import immutable = require("immutable")
+import { merge } from "./util"
+
+export interface ScribeOptions {
+    allowBlockElements?: boolean
+    debug?: boolean
+    undo?: {
+        limit?: number
+        interval?: number
+        enabled?: boolean
+        manager?: UndoManager
+    }
+    defaultPlugins?: string[]
+    defaultFormatters?: string[]
+    defaultCommandPatches?: string[]
+}
 
 const blockModePlugins = [
     'setRootPElement',
@@ -10,13 +24,11 @@ const inlineModePlugins = [
     'inlineElementsMode'
 ]
 
-const defaultPlugins = blockModePlugins.concat(inlineModePlugins)
-
-export var defaultOptions = {
+const defaultOptions: ScribeOptions = {
     allowBlockElements: true,
     debug: false,
     undo: {
-        manager: false,
+        manager: null,
         enabled: true,
         limit: 100,
         interval: 250
@@ -29,20 +41,11 @@ export var defaultOptions = {
         'outdent',
         'createLink'
     ],
-
-    defaultPlugins,
-
+    defaultPlugins: blockModePlugins.concat(inlineModePlugins),
     defaultFormatters: [
         'escapeHtmlCharactersFormatter',
         'replaceNbspCharsFormatter'
     ]
-}
-
-function defaults(options, defaultOptions) {
-    const optionsCopy = immutable.fromJS(options);
-    const defaultsCopy = immutable.fromJS(defaultOptions);
-    const mergedOptions = defaultsCopy.merge(optionsCopy);
-    return mergedOptions.toJS();
 }
 
 /**
@@ -51,8 +54,8 @@ function defaults(options, defaultOptions) {
  * @param  userSuppliedOptions - The user's options
  * @return - The overridden options
  */
-export function checkOptions(userSuppliedOptions: Object) {
-    var options = userSuppliedOptions || {}
+export function checkOptions(userSuppliedOptions: ScribeOptions) {
+    var options: ScribeOptions = userSuppliedOptions || {}
 
     // Remove invalid plugins
     if (options.defaultPlugins) {
@@ -63,7 +66,7 @@ export function checkOptions(userSuppliedOptions: Object) {
         options.defaultFormatters = options.defaultFormatters.filter(filterByPluginExists(defaultOptions.defaultFormatters))
     }
 
-    return Object.freeze(defaults(options, defaultOptions))
+    return Object.freeze(merge(defaultOptions, options)) as ScribeOptions
 }
 
 interface Sorter {

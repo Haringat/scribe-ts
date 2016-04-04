@@ -21,8 +21,6 @@ class OutdentCommand extends Command {
     }
 }
 
-export = function() {
-    return function(scribe: Scribe) {
-        scribe.commands["outdent"] = new OutdentCommand(scribe)
-    }
+export = function(scribe: Scribe) {
+    scribe.commands["outdent"] = new OutdentCommand(scribe)
 }

@@ -85,8 +85,6 @@ class OutdentCommand extends CommandPatch {
     }
 }
 
-export = function() {
-    return function(scribe: Scribe) {
-        scribe.commandPatches["outdent"] = new OutdentCommand(scribe)
-    }
+export = function(scribe: Scribe) {
+    scribe.commandPatches["outdent"] = new OutdentCommand(scribe)
 }

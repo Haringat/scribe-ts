@@ -22,6 +22,6 @@ var patches = {
         createLink,
     },
     events
-};
+}
 
 export = patches

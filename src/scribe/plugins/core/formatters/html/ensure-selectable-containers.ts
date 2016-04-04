@@ -54,15 +54,13 @@ function traverse(parentNode: Element) {
     }
 }
 
-export = function() {
-    return function(scribe: Scribe) {
-        scribe.registerHTMLFormatter('normalize', function(html) {
-            var bin = document.createElement('div')
-            bin.innerHTML = html
+export = function(scribe: Scribe) {
+    scribe.registerHTMLFormatter('normalize', function(html) {
+        var bin = document.createElement('div')
+        bin.innerHTML = html
 
-            traverse(bin)
+        traverse(bin)
 
-            return bin.innerHTML
-        })
-    }
+        return bin.innerHTML
+    })
 }

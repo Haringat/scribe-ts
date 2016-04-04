@@ -2,7 +2,7 @@ import { Scribe } from "../../../../../scribe"
 import { CommandPatch} from "../../../../api/command-patch"
 
 class BoldCommand extends CommandPatch {
-    constructor(scribe) {
+    constructor(scribe: Scribe) {
         super(scribe, "bold")
     }
 
@@ -18,11 +18,9 @@ class BoldCommand extends CommandPatch {
     }
 }
 
-export = function() {
-    return function(scribe) {
-        // TODO: We can't use STRONGs because this would mean we have to
-        // re-implement the `queryState` command, which would be difficult.
+export = function(scribe: Scribe) {
+    // TODO: We can't use STRONGs because this would mean we have to
+    // re-implement the `queryState` command, which would be difficult.
 
-        scribe.commandPatches["bold"] = new BoldCommand(scribe)
-    }
+    scribe.commandPatches["bold"] = new BoldCommand(scribe)
 }

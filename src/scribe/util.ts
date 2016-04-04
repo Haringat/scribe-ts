@@ -32,3 +32,23 @@ export function some<T>(values: ItemList<T>, predicate: Predicate<T>): boolean {
     
     return false
 }
+
+/// Recursively merges properties from a list of objects
+export function merge(...objects: Object[]): Object {
+	function patch(target, source) {
+		for (var p in source) {
+			if (source.hasOwnProperty(p)) {
+				target[p] = typeof source[p] === 'object' ? merge(target[p], source[p]) : source[p];
+			}
+		}
+		return target;
+	}
+	
+	var result = {}
+	
+	for (var i=0; i<objects.length; i++) {
+		patch(result, objects[i])
+	}
+	
+	return result
+}

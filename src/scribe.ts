@@ -8,24 +8,10 @@ import { TransactionManager } from "./scribe/transaction-manager"
 import { ScribeUndoManager } from "./scribe/undo-manager"
 import EventEmitter = require("./scribe/event-emitter")
 import * as nodeHelpers from "./scribe/node"
-import Immutable = require("immutable")
 import * as config from "./scribe/config"
 import { CommandInterface } from "./scribe/api/command"
 import { CommandPatch } from "./scribe/api/command-patch"
-
-export interface Options {
-    allowBlockElements?: boolean
-    debug?: boolean
-    undo?: {
-        limit?:  number
-        interval?: number
-        enabled?: boolean
-        manager?: UndoManager
-    }
-    defaultPlugins: string[]
-    defaultFormatters: string[]
-    defaultCommandPatches: string[]
-}
+import { ScribeOptions } from "./scribe/config"
 
 export interface ScribePlugin {
     (scribe: Scribe): void
@@ -41,10 +27,10 @@ export class Scribe extends EventEmitter {
     static element = Scribe.node // TODO eliminate duplicate
 
     el: HTMLElement
-    commands: { [name: string]: CommandInterface } = {}
-    commandPatches: { [name: string]: CommandPatch } = {}
+    commands: { [name: string]: CommandInterface }
+    commandPatches: { [name: string]: CommandPatch }
     api: ScribeApi
-    options: Options
+    options: ScribeOptions
     transactionManager: TransactionManager
     undoManager: UndoManager
     _merge: boolean
@@ -53,10 +39,15 @@ export class Scribe extends EventEmitter {
     _lastItem: DOMTransaction = { content: '' } // TODO ???
     _skipFormatters: boolean
 
-    constructor(el: HTMLElement, options: Options) {
+    constructor(el: HTMLElement, options: ScribeOptions) {
         super()
 
+        this.options = config.checkOptions(options);
+
         this.el = el
+        this.commands = {}
+        this.commandPatches = {}
+        
         this.api = new ScribeApi(this)
 
         this.transactionManager = new TransactionManager(this)
@@ -73,42 +64,39 @@ export class Scribe extends EventEmitter {
             this._lastItem = { content: '' }
         }
 
-        this.setHTML(this.getHTML());
+        this.setHTML(this.getHTML())
 
-        this.el.setAttribute('contenteditable', null);
+        this.el.setAttribute('contenteditable', null)
 
-        this.el.addEventListener('input', () => {
-            /**
-             * This event triggers when either the user types something or a native
-             * command is executed which causes the content to change (i.e.
-             * `document.execCommand('bold')`). We can't wrap a transaction around
-             * these actions, so instead we run the transaction in this event.
-             */
-            this.transactionManager.run();
-        }, false);
+        /**
+         * This event triggers when either the user types something or a native
+         * command is executed which causes the content to change (i.e.
+         * `document.execCommand('bold')`). We can't wrap a transaction around
+         * these actions, so instead we run the transaction in this event.
+         */
+        this.el.addEventListener('input', () => { this.transactionManager.run() }, false)
 
         /**
          * Core Plugins
          */
-        var corePlugins = Immutable.OrderedSet(options.defaultPlugins)
-            .sort(config.sortByPlugin('setRootPElement')) // Ensure `setRootPElement` is always loaded first
+        var corePlugins = options.defaultPlugins
             .filter(config.filterByBlockLevelMode(this.allowsBlockElements()))
-            .map(function(plugin) { return plugins[plugin]; });
+            .sort(config.sortByPlugin('setRootPElement')) // Ensure `setRootPElement` is always loaded first
+            .map<ScribePlugin>(plugin => plugins[plugin]) // TODO avoid explicit type mapping
 
         // Formatters
-        var defaultFormatters = Immutable.List(options.defaultFormatters)
-            .filter(function(formatter) { return !!formatters[formatter]; })
-            .map(function(formatter) { return formatters[formatter]; });
+        var defaultFormatters = options.defaultFormatters
+            .filter(formatter => !!formatters[formatter])
+            .map<ScribePlugin>(formatter => formatters[formatter]) // TODO avoid explicit type mapping
 
         // Patches
 
-        var defaultPatches = Immutable.List.of(
-            patches.events
-        );
+        var defaultPatches: ScribePlugin[] = [patches.events]
 
-        var defaultCommandPatches = Immutable.List(options.defaultCommandPatches).map(function(patch) { return patches.commands[patch]; });
+        var defaultCommandPatches = options.defaultCommandPatches
+            .map<ScribePlugin>(patch => patches.commands[patch]) // TODO avoid explicit type mapping
 
-        var defaultCommands: CommandInterface[] = ([
+        var defaultCommands = [
             'indent',
             'insertList',
             'outdent',
@@ -116,20 +104,18 @@ export class Scribe extends EventEmitter {
             'subscript',
             'superscript',
             'undo'
-        ]).map(command => commands[command]);
+        ].map<ScribePlugin>(command => commands[command]) // TODO avoid explicit type mapping
 
-        var allPlugins = Immutable.List().concat(
+        var allPlugins: ScribePlugin[] = [].concat(
             corePlugins,
             defaultFormatters,
             defaultPatches,
             defaultCommandPatches,
-            defaultCommands);
+            defaultCommands)
 
-        allPlugins.forEach(function(plugin) {
-            this.use(plugin());
-        }.bind(this));
+        allPlugins.forEach(plugin => this.use(plugin))
 
-        this.use(events());
+        this.use(events)
     }
 
     // For plugins

@@ -56,8 +56,6 @@ class IndentCommand extends CommandPatch {
     }
 }
 
-export = function() {
-    return function(scribe: Scribe) {
-        scribe.commandPatches["indent"] = new IndentCommand(scribe)
-    }
+export = function(scribe: Scribe) {
+    scribe.commandPatches["indent"] = new IndentCommand(scribe)
 }
