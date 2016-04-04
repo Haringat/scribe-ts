@@ -10,7 +10,7 @@ export class CommandPatch {
         this.commandName = commandName
     }
 
-    execute(value) {
+    execute(value?) {
         this.scribe.transactionManager.run(() => {
             document.execCommand(this.commandName, false, value || null)
         })

@@ -1,15 +1,22 @@
-  export = function () {
-    return function (scribe) {
-      var insertHTMLCommandPatch = new scribe.api.CommandPatch('insertHTML');
-      var nodeHelpers = scribe.node;
+import { Scribe } from "../../../../../scribe"
+import { CommandPatch} from "../../../../api/command-patch"
+import * as nodeHelpers from "../../../../node"
 
-      insertHTMLCommandPatch.execute = function (value) {
-        scribe.transactionManager.run(function () {
-          scribe.api.CommandPatch.prototype.execute.call(this, value);
-          nodeHelpers.removeChromeArtifacts(scribe.el);
-        }.bind(this));
-      };
+class InsertHTMLCommand extends CommandPatch {
+    constructor(scribe: Scribe) {
+        super(scribe, "insertHTML")
+    }
 
-      scribe.commandPatches.insertHTML = insertHTMLCommandPatch;
-    };
-  };
+    execute(value) {
+        this.scribe.transactionManager.run(() => {
+            super.execute(value)
+            nodeHelpers.removeChromeArtifacts(this.scribe.el)
+        })
+    }
+}
+
+export = function() {
+    return function(scribe: Scribe) {
+        scribe.commandPatches["insertHTML"] = new InsertHTMLCommand(scribe)
+    }
+}

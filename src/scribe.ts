@@ -11,6 +11,7 @@ import * as nodeHelpers from "./scribe/node"
 import Immutable = require("immutable")
 import * as config from "./scribe/config"
 import { Command } from "./scribe/api/command"
+import { CommandPatch } from "./scribe/api/command-patch"
 
 export interface Options {
     allowBlockElements?: boolean
@@ -39,7 +40,7 @@ export class Scribe extends EventEmitter {
     el: HTMLElement
     commands: { [name: string]: Command } = {}
     options: Options
-    commandPatches: { [name: string]: Command } = {}
+    commandPatches: { [name: string]: CommandPatch } = {}
     api: ScribeApi
     transactionManager: TransactionManager
     undoManager: ScribeUndoManager

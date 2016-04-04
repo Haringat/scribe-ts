@@ -1,10 +1,13 @@
-  export = function () {
-    return function (scribe) {
-      var createLinkCommand = new scribe.api.CommandPatch('createLink');
-      scribe.commandPatches.createLink = createLinkCommand;
+import { Scribe } from "../../../../../scribe"
+import { CommandPatch} from "../../../../api/command-patch"
 
-      createLinkCommand.execute = function (value) {
-        var selection = new scribe.api.Selection();
+class CreateLinkCommand extends CommandPatch {
+    constructor(scribe: Scribe) {
+        super(scribe, "createLink")
+    }
+
+    execute(value) {
+        var selection = new this.scribe.api.Selection()
 
         /**
          * Firefox does not create a link when selection is collapsed
@@ -12,22 +15,27 @@
          */
         // using range.collapsed vs selection.isCollapsed - https://code.google.com/p/chromium/issues/detail?id=447523
         if (selection.range.collapsed) {
-          var aElement = document.createElement('a');
-          aElement.setAttribute('href', value);
-          aElement.textContent = value;
+            var aElement = document.createElement('a')
+            aElement.setAttribute('href', value)
+            aElement.textContent = value
 
-          selection.range.insertNode(aElement);
+            selection.range.insertNode(aElement)
 
-          // Select the created link
-          var newRange = document.createRange();
-          newRange.setStartBefore(aElement);
-          newRange.setEndAfter(aElement);
+            // Select the created link
+            var newRange = document.createRange()
+            newRange.setStartBefore(aElement)
+            newRange.setEndAfter(aElement)
 
-          selection.selection.removeAllRanges();
-          selection.selection.addRange(newRange);
+            selection.selection.removeAllRanges()
+            selection.selection.addRange(newRange)
         } else {
-          scribe.api.CommandPatch.prototype.execute.call(this, value);
+            super.execute(value)
         }
-      };
-    };
-  };
+    }
+}
+
+export = function() {
+    return function(scribe) {
+        scribe.commandPatches["createLink"] = new CreateLinkCommand(scribe)
+    }
+}

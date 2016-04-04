@@ -1,60 +1,63 @@
-  /**
-   * Prevent Chrome from inserting BLOCKQUOTEs inside of Ps, and also from
-   * adding a redundant `style` attribute to the created BLOCKQUOTE.
-   */
+import { Scribe } from "../../../../../scribe"
+import { CommandPatch} from "../../../../api/command-patch"
 
-  var INVISIBLE_CHAR = '\uFEFF';
+/**
+ * Prevent Chrome from inserting BLOCKQUOTEs inside of Ps, and also from
+ * adding a redundant `style` attribute to the created BLOCKQUOTE.
+ */
 
-  export = function () {
-    return function (scribe) {
-      var indentCommand = new scribe.api.CommandPatch('indent');
+var INVISIBLE_CHAR = '\uFEFF';
 
-      indentCommand.execute = function (value) {
-        scribe.transactionManager.run(function () {
-          /**
-           * Chrome: If we apply the indent command on an empty P, the
-           * BLOCKQUOTE will be nested inside the P.
-           * As per: http://jsbin.com/oDOriyU/3/edit?html,js,output
-           */
-          var selection = new scribe.api.Selection();
-          var range = selection.range;
+class IndentCommand extends CommandPatch {
+    constructor(scribe: Scribe) {
+        super(scribe, "indent")
+    }
 
-          var isCaretOnNewLine =
-              (range.commonAncestorContainer.nodeName === 'P'
-               && range.commonAncestorContainer.innerHTML === '<br>');
-          if (isCaretOnNewLine) {
-            // FIXME: this text node is left behind. Tidy it up somehow,
-            // or don't use it at all.
-            var textNode = document.createTextNode(INVISIBLE_CHAR);
+    execute(value) {
+        this.scribe.transactionManager.run(() => {
+            /**
+             * Chrome: If we apply the indent command on an empty P, the
+             * BLOCKQUOTE will be nested inside the P.
+             * As per: http://jsbin.com/oDOriyU/3/edit?html,js,output
+             */
+            var selection = new this.scribe.api.Selection()
+            var range = selection.range
 
-            range.insertNode(textNode);
+            var isCaretOnNewLine = (range.commonAncestorContainer.nodeName === 'P') && (range.commonAncestorContainer.innerHTML === '<br>')
+            if (isCaretOnNewLine) {
+                // FIXME: this text node is left behind. Tidy it up somehow,
+                // or don't use it at all.
+                var textNode = document.createTextNode(INVISIBLE_CHAR)
 
-            range.setStart(textNode, 0);
-            range.setEnd(textNode, 0);
+                range.insertNode(textNode)
 
-            selection.selection.removeAllRanges();
-            selection.selection.addRange(range);
-          }
+                range.setStart(textNode, 0)
+                range.setEnd(textNode, 0)
 
-          scribe.api.CommandPatch.prototype.execute.call(this, value);
+                selection.selection.removeAllRanges()
+                selection.selection.addRange(range)
+            }
 
-          /**
-           * Chrome: The BLOCKQUOTE created contains a redundant style attribute.
-           * As per: http://jsbin.com/AkasOzu/1/edit?html,js,output
-           */
+            super.execute(value)
 
-          // Renew the selection
-          selection = new scribe.api.Selection();
-          var blockquoteNode = selection.getContaining(function (node) {
-            return node.nodeName === 'BLOCKQUOTE';
-          });
+            /**
+             * Chrome: The BLOCKQUOTE created contains a redundant style attribute.
+             * As per: http://jsbin.com/AkasOzu/1/edit?html,js,output
+             */
 
-          if (blockquoteNode) {
-            blockquoteNode.removeAttribute('style');
-          }
-        }.bind(this));
-      };
+            // Renew the selection
+            selection = new this.scribe.api.Selection()
+            var blockquoteNode = selection.getContaining((node) => node.nodeName === 'BLOCKQUOTE') as HTMLElement
 
-      scribe.commandPatches.indent = indentCommand;
-    };
-  };
+            if (blockquoteNode) {
+                blockquoteNode.removeAttribute('style')
+            }
+        })
+    }
+}
+
+export = function() {
+    return function(scribe: Scribe) {
+        scribe.commandPatches["indent"] = new IndentCommand(scribe)
+    }
+}
