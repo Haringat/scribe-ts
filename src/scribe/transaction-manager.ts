@@ -24,7 +24,7 @@ export class TransactionManager {
         }
     }
 
-    run(transaction: Function, forceMerge?: boolean) {
+    run(transaction?: Function, forceMerge?: boolean) {
         this.start();
         // If there is an error, don't prevent the transaction from ending.
         try {

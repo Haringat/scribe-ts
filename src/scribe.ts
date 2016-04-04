@@ -20,7 +20,7 @@ export interface Options {
         limit?:  number
         interval?: number
         enabled?: boolean
-        manager?: any
+        manager?: UndoManager
     }
 }
 
@@ -39,11 +39,11 @@ export class Scribe extends EventEmitter {
 
     el: HTMLElement
     commands: { [name: string]: Command } = {}
-    options: Options
     commandPatches: { [name: string]: CommandPatch } = {}
     api: ScribeApi
+    options: Options
     transactionManager: TransactionManager
-    undoManager: ScribeUndoManager
+    undoManager: UndoManager
     _merge: boolean
     _forceMerge: boolean
     _mergeTimer = 0
@@ -54,19 +54,15 @@ export class Scribe extends EventEmitter {
         super()
 
         this.el = el
-        this.options = config.checkOptions(options)
         this.api = new ScribeApi(this)
 
         this.transactionManager = new TransactionManager(this)
 
-        //added for explicit checking later eg if (scribe.undoManager) { ... }
-        this.undoManager = false
-
-        if (this.options.undo.enabled) {
-            if (this.options.undo.manager) {
-                this.undoManager = this.options.undo.manager
+        if (options.undo.enabled) {
+            if (options.undo.manager) {
+                this.undoManager = options.undo.manager
             } else {
-                this.undoManager = new ScribeUndoManager(this.options.undo.limit, this.el)
+                this.undoManager = new ScribeUndoManager(options.undo.limit, this.el)
             }
             this._merge = false
             this._forceMerge = false
@@ -78,7 +74,7 @@ export class Scribe extends EventEmitter {
 
         this.el.setAttribute('contenteditable', null);
 
-        this.el.addEventListener('input', function() {
+        this.el.addEventListener('input', () => {
             /**
              * This event triggers when either the user types something or a native
              * command is executed which causes the content to change (i.e.
@@ -86,18 +82,18 @@ export class Scribe extends EventEmitter {
              * these actions, so instead we run the transaction in this event.
              */
             this.transactionManager.run();
-        }.bind(this), false);
+        }, false);
 
         /**
          * Core Plugins
          */
-        var corePlugins = Immutable.OrderedSet(this.options.defaultPlugins)
+        var corePlugins = Immutable.OrderedSet(options.defaultPlugins)
             .sort(config.sortByPlugin('setRootPElement')) // Ensure `setRootPElement` is always loaded first
             .filter(config.filterByBlockLevelMode(this.allowsBlockElements()))
             .map(function(plugin) { return plugins[plugin]; });
 
         // Formatters
-        var defaultFormatters = Immutable.List(this.options.defaultFormatters)
+        var defaultFormatters = Immutable.List(options.defaultFormatters)
             .filter(function(formatter) { return !!formatters[formatter]; })
             .map(function(formatter) { return formatters[formatter]; });
 
@@ -107,7 +103,7 @@ export class Scribe extends EventEmitter {
             patches.events
         );
 
-        var defaultCommandPatches = Immutable.List(this.options.defaultCommandPatches).map(function(patch) { return patches.commands[patch]; });
+        var defaultCommandPatches = Immutable.List(options.defaultCommandPatches).map(function(patch) { return patches.commands[patch]; });
 
         var defaultCommands: Command[] = ([
             'indent',
@@ -141,7 +137,7 @@ export class Scribe extends EventEmitter {
     }
 
     setHTML(html: string, skipFormatters: boolean = false) {
-        if (this.options.undo.enabled) {
+        if (this.undoManager) {
             this._lastItem.content = html;
         }
 
@@ -173,47 +169,46 @@ export class Scribe extends EventEmitter {
          * browser magic around `Document.queryCommandState` (http://jsbin.com/eDOxacI/1/edit?js,console,output).
          * This happens when doing any DOM manipulation.
          */
-        var scribe = this;
 
-        if (scribe.options.undo.enabled) {
+        if (this.undoManager) {
             // Get scribe previous content, and strip markers.
-            var lastContentNoMarkers = scribe._lastItem.content.replace(/<em [^>]*class="scribe-marker"[^>]*>[^<]*?<\/em>/g, '');
+            var lastContentNoMarkers = this._lastItem.content.replace(/<em [^>]*class="scribe-marker"[^>]*>[^<]*?<\/em>/g, '')
 
             // We only want to push the history if the content actually changed.
-            if (scribe.getHTML() !== lastContentNoMarkers) {
-                var selection = new scribe.api.Selection()
+            if (this.getHTML() !== lastContentNoMarkers) {
+                var selection = new this.api.Selection()
 
                 selection.placeMarkers()
-                var content = scribe.getHTML()
+                var content = this.getHTML()
                 selection.removeMarkers()
 
                 // Checking if there is a need to merge, and that the previous history item
                 // is the last history item of the same scribe instance.
                 // It is possible the last transaction is not for the same instance, or
                 // even not a scribe transaction (e.g. when using a shared undo manager).
-                var previousItem = scribe.undoManager.item(scribe.undoManager.position);
-                if ((scribe._merge || scribe._forceMerge) && previousItem && scribe._lastItem == previousItem[0]) {
+                var previousItem = this.undoManager.item(this.undoManager.position);
+                if ((this._merge || this._forceMerge) && previousItem && this._lastItem == previousItem[0]) {
                     // If so, merge manually with the last item to save more memory space.
-                    scribe._lastItem.content = content
+                    this._lastItem.content = content
                 }
                 else {
                     // Otherwise, create a new history item, and register it as a new transaction
-                    scribe._lastItem = {
-                        previousItem: scribe._lastItem,
+                    this._lastItem = {
+                        previousItem: this._lastItem,
                         content: content,
-                        scribe: scribe,
+                        scribe: this,
                         execute: function() { },
                         undo: function() { this.scribe.restoreFromHistory(this.previousItem) },
                         redo: function() { this.scribe.restoreFromHistory(this) }
                     }
 
-                    scribe.undoManager.transact(scribe._lastItem, false)
+                    this.undoManager.transact(this._lastItem, false)
                 }
 
                 // Merge next transaction if it happens before the interval option, otherwise don't merge.
-                clearTimeout(scribe._mergeTimer)
-                scribe._merge = true
-                scribe._mergeTimer = setTimeout(function() { scribe._merge = false; }, scribe.options.undo.interval)
+                clearTimeout(this._mergeTimer)
+                this._merge = true
+                this._mergeTimer = setTimeout(() => { this._merge = false }, this.options.undo.interval)
 
                 return true
             }
@@ -232,7 +227,7 @@ export class Scribe extends EventEmitter {
         this.setHTML(historyItem.content, true)
 
         // Restore the selection
-        var selection = this.api.Selection()
+        var selection = new this.api.Selection()
         selection.selectMarkers()
 
         // Because we skip the formatters, a transaction is not run, so we have to
@@ -241,7 +236,7 @@ export class Scribe extends EventEmitter {
     }
 
     // This will most likely be moved to another object eventually
-    allowsBlockElements() {
+    allowsBlockElements(): boolean {
         return this.options.allowBlockElements
     }
 
@@ -277,11 +272,11 @@ export class Scribe extends EventEmitter {
 
         // TODO: error if the selection is not within the Scribe instance? Or
         // focus the Scribe instance if it is not already focused?
-        this.getCommand('insertHTML').execute(this.format(html));
+        this.getCommand('insertHTML').execute(this.format(html))
     }
 
-    isDebugModeEnabled() {
-        return this.options.debug;
+    isDebugModeEnabled(): boolean {
+        return this.options.debug
     }
 
     filters: { [name: string] : FilterList } = {
