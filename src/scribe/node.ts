@@ -66,6 +66,10 @@ export function isCaretPositionNode(node: Node): node is HTMLElement {
     return elementHasClass(node, "caret-position")
 }
 
+export function isWhitespaceOnlyTextNode(node: Node) {
+    return (node.nodeType === Node.TEXT_NODE && /^\s*$/.test(node.nodeValue))
+}
+
 export function firstDeepestChild(node: Node): Node {
     var fs = node.firstChild
 
@@ -135,6 +139,33 @@ export function unwrap(node: Node, childNode: Node) {
 }
 
 /**
+ * Wrap consecutive inline elements and text nodes in a P element.
+ */
+export function wrapChildNodes(parentNode: Node) {
+    var index = 0
+
+    toArray(parentNode.childNodes)
+        .filter(function(node) {
+            return !isWhitespaceOnlyTextNode(node)
+        })
+        .filter(function(node) {
+            return node.nodeType === Node.TEXT_NODE || !isBlockElement(node)
+        })
+        .reduce<Node[][]>(function(result, node, key, list) {
+            index += (key === 0 || node.previousSibling === list[key - 1]) ? 0 : 1
+            if (result[index]) {
+                result[index].push(node)
+            } else {
+                result[index] = [node]
+            }
+            return result
+        }, [])
+        .forEach(function(nodeGroup) {
+            wrap(nodeGroup, document.createElement('p'))
+        })
+}
+
+/**
  * Chrome: If a parent node has a CSS `line-height` when we apply the
  * insertHTML command, Chrome appends a SPAN to plain content with
  * inline styling replicating that `line-height`, and adjusts the
@@ -156,12 +187,12 @@ export function removeChromeArtifacts(parentElement: Node) {
             if (!node.getAttribute("style")) {
                 node.removeAttribute("style");
             }
-            
+
             if (node.nodeName === "SPAN" && node.attributes.length === 0) {
                 emptySpans.push(node);
             }
         }
-        
+
         for (let node of emptySpans) {
             unwrap(node.parentNode, node);
         }

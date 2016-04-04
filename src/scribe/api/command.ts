@@ -6,6 +6,7 @@ export class Command {
 
     commandName: string
     patch: Command
+    event: Event // TODO necessary? only for some third-party plug-in, reportedly
 
     constructor(scribe: Scribe, commandName: string) {
         this.scribe = scribe
