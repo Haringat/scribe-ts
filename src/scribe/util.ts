@@ -38,7 +38,9 @@ export function merge(...objects: Object[]): Object {
 	function patch(target, source) {
 		for (var p in source) {
 			if (source.hasOwnProperty(p)) {
-				target[p] = typeof source[p] === 'object' ? merge(target[p], source[p]) : source[p];
+				target[p] = (typeof source[p] === 'object') && (source[p] !== null) && !(source[p] instanceof Array)
+                    ? merge(target[p], source[p]) // recursively merge non-array objects
+                    : source[p]; // copy all other properties (even arrays)
 			}
 		}
 		return target;

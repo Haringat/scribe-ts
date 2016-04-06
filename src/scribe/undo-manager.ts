@@ -2,7 +2,7 @@ import { Scribe } from "../scribe"
 
 export class ScribeUndoManager implements UndoManager {
 
-    private _ush: any
+    private _ush: HTMLElement
     private _stack: DOMTransaction[][] // TODO type?
     private _limit: number
     private _fireEvent: boolean
@@ -10,7 +10,7 @@ export class ScribeUndoManager implements UndoManager {
     position: number
     length: number
 
-    constructor(limit: number, undoScopeHost) {
+    constructor(limit: number, undoScopeHost: HTMLElement) {
         this._stack = []
         this._limit = limit
         this._fireEvent = typeof CustomEvent != 'undefined' && undoScopeHost && undoScopeHost.dispatchEvent
@@ -94,10 +94,10 @@ export class ScribeUndoManager implements UndoManager {
         this.position = 0
     }
 
-    _dispatch(event: string, transactions) {
+    _dispatch(event: string, transactions: DOMTransaction[]) {
         if (this._fireEvent) {
             this._ush.dispatchEvent(new CustomEvent(event, {
-                detail: { transactions: transactions.toArray() },
+                detail: { transactions: transactions },
                 bubbles: true,
                 cancelable: false
             }))

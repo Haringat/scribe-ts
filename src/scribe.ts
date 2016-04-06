@@ -42,8 +42,7 @@ export class Scribe extends EventEmitter {
     constructor(el: HTMLElement, options: ScribeOptions) {
         super()
 
-        this.options = config.checkOptions(options);
-
+        this.options = config.checkOptions(options)
         this.el = el
         this.commands = {}
         this.commandPatches = {}
@@ -51,6 +50,8 @@ export class Scribe extends EventEmitter {
         this.api = new ScribeApi(this)
 
         this.transactionManager = new TransactionManager(this)
+
+        var options = this.options
 
         if (options.undo.enabled) {
             if (options.undo.manager) {
@@ -66,7 +67,7 @@ export class Scribe extends EventEmitter {
 
         this.setHTML(this.getHTML())
 
-        this.el.setAttribute('contenteditable', null)
+        this.el.setAttribute('contenteditable', 'true')
 
         /**
          * This event triggers when either the user types something or a native

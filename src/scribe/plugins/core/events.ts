@@ -213,7 +213,7 @@ export = function(scribe: Scribe) {
 
             var bin = document.createElement('div')
             document.body.appendChild(bin)
-            bin.setAttribute('contenteditable', null)
+            bin.setAttribute('contenteditable', 'true')
             bin.focus()
 
             // Wait for the paste to happen (next loop?)
