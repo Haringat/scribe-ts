@@ -37,7 +37,7 @@ export class Scribe extends EventEmitter {
     _merge: boolean
     _forceMerge: boolean
     _mergeTimer = 0
-    _lastItem: DOMTransaction = { content: '' } // TODO ???
+    _lastItem: any = { content: '' } // TODO what is this?? not DOMTransaction, apparently
     _skipFormatters: boolean
 
     constructor(el: HTMLElement, options: ScribeOptions) {

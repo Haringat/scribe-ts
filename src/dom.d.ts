@@ -24,3 +24,9 @@ interface UndoManager {
     clearUndo(): void
     clearRedo(): void
 }
+
+// https://dxr.mozilla.org/mozilla-central/source/dom/webidl/Range.webidl
+
+interface Range {
+    intersectsNode(node: Node): boolean
+}

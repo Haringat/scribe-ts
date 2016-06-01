@@ -22,8 +22,9 @@ class IndentCommand extends CommandPatch {
              */
             var selection = new this.scribe.api.Selection()
             var range = selection.range
+            var ancestor = range.commonAncestorContainer as HTMLElement
 
-            var isCaretOnNewLine = (range.commonAncestorContainer.nodeName === 'P') && (range.commonAncestorContainer.innerHTML === '<br>')
+            var isCaretOnNewLine = (ancestor.nodeName === 'P') && (ancestor.innerHTML === '<br>')
             if (isCaretOnNewLine) {
                 // FIXME: this text node is left behind. Tidy it up somehow,
                 // or don't use it at all.
