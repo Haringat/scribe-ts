@@ -17,6 +17,18 @@ export function isHTMLElement(node: Node): node is HTMLElement {
     return node.nodeType === Node.ELEMENT_NODE
 }
 
+export function hasContent(node): boolean {
+    if (node && node.children && node.children.length > 0) {
+        return true
+    }
+
+    if (node && node.nodeName === 'BR') {
+        return true
+    }
+
+    return false
+}
+
 /// return true if nested inline tags ultimately just contain <br> or ""
 export function isEmptyInlineElement(node: Node): boolean {
     if (isHTMLElement(node)) {
@@ -145,13 +157,13 @@ export function wrapChildNodes(parentNode: Node) {
     var index = 0
 
     toArray(parentNode.childNodes)
-        .filter(function(node) {
+        .filter(function (node) {
             return !isWhitespaceOnlyTextNode(node)
         })
-        .filter(function(node) {
+        .filter(function (node) {
             return node.nodeType === Node.TEXT_NODE || !isBlockElement(node)
         })
-        .reduce<Node[][]>(function(result, node, key, list) {
+        .reduce<Node[][]>(function (result, node, key, list) {
             index += (key === 0 || node.previousSibling === list[key - 1]) ? 0 : 1
             if (result[index]) {
                 result[index].push(node)
@@ -160,7 +172,7 @@ export function wrapChildNodes(parentNode: Node) {
             }
             return result
         }, [])
-        .forEach(function(nodeGroup) {
+        .forEach(function (nodeGroup) {
             wrap(nodeGroup, document.createElement('p'))
         })
 }

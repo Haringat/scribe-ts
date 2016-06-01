@@ -1,7 +1,6 @@
 import { Scribe } from "../../../../scribe"
 import { Command } from "../../../api/command"
-
-const Z_KEY = 90
+import { isUndoKeyCombination } from "../../../keystrokes"
 
 class UndoCommand extends Command {
     constructor(scribe: Scribe) {
@@ -10,7 +9,7 @@ class UndoCommand extends Command {
         if (scribe.options.undo.enabled) {
             scribe.el.addEventListener('keydown', (event) => {
                 // TODO keyboard shortcut handling really doesn't belong here
-                if (!event.shiftKey && (event.metaKey || event.ctrlKey) && event.keyCode === Z_KEY) {
+                if (isUndoKeyCombination(event)) {
                     event.preventDefault()
                     this.execute()
                 }

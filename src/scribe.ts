@@ -2,6 +2,7 @@ import * as plugins from "./scribe/plugins/core/plugins"
 import * as commands from "./scribe/plugins/core/commands"
 import * as formatters from "./scribe/plugins/core/formatters"
 import events = require("./scribe/plugins/core/events")
+import eventNames = require("./scribe/events")
 import * as patches from "./scribe/plugins/core/patches"
 import { ScribeApi } from "./scribe/api"
 import { TransactionManager } from "./scribe/transaction-manager"
@@ -222,7 +223,8 @@ export class Scribe extends EventEmitter {
 
         // Because we skip the formatters, a transaction is not run, so we have to
         // emit this event ourselves.
-        this.trigger('content-changed')
+        this.trigger(eventNames.legacyContentChanged)
+        this.trigger(eventNames.contentChanged)
     }
 
     // This will most likely be moved to another object eventually
@@ -238,7 +240,8 @@ export class Scribe extends EventEmitter {
 
         this.setHTML(content)
 
-        this.trigger('content-changed')
+        this.trigger(eventNames.legacyContentChanged)
+        this.trigger(eventNames.contentChanged)
     }
 
     insertPlainText(plainText: string) {
@@ -292,6 +295,10 @@ export class Scribe extends EventEmitter {
 
     formatForExport(html: string): string {
         return this.filters["text"].filter(html)
+    }
+    
+    destroy() {
+        this.trigger(eventNames.destroy)
     }
 }
 

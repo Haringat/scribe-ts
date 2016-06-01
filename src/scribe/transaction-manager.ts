@@ -1,4 +1,5 @@
 import { Scribe } from "../scribe"
+import eventNames = require("../scribe/events")
 
 export class TransactionManager {
 
@@ -20,7 +21,8 @@ export class TransactionManager {
 
         if (this.history.length === 0) {
             this.scribe.pushHistory()
-            this.scribe.trigger('content-changed')
+            this.scribe.trigger(eventNames.legacyContentChanged)
+            this.scribe.trigger(eventNames.contentChanged)
         }
     }
 

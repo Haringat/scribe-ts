@@ -1,4 +1,5 @@
 import { Scribe } from "../../../scribe"
+import * as node from "../../node"
 
 const ENTER = 13
 
@@ -9,7 +10,7 @@ function hasContent(rootNode): boolean {
     while (treeWalker.nextNode()) {
         if (treeWalker.currentNode) {
             // If the node is a non-empty element or has content
-            if (~['br'].indexOf(treeWalker.currentNode.nodeName.toLowerCase()) || treeWalker.currentNode.length > 0) {
+            if (node.hasContent(treeWalker.currentNode)) {
                 return true
             }
         }

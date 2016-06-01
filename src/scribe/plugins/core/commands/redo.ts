@@ -1,7 +1,6 @@
 import { Scribe } from "../../../../scribe"
 import { Command } from "../../../api/command"
-
-const Z_KEY = 90
+import { isRedoKeyCombination } from "../../../keystrokes"
 
 class RedoCommand extends Command {
     constructor(scribe: Scribe) {
@@ -11,7 +10,7 @@ class RedoCommand extends Command {
         if (scribe.options.undo.enabled) {
             // TODO keyboard shortcut handling doesn't belong here
             scribe.el.addEventListener('keydown', (event) => {
-                if (event.shiftKey && (event.metaKey || event.ctrlKey) && event.keyCode === Z_KEY) {
+                if (isRedoKeyCombination(event)) {
                     event.preventDefault()
                     this.execute()
                 }

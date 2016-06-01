@@ -13,7 +13,7 @@ export class ScribeUndoManager implements UndoManager {
     constructor(limit: number, undoScopeHost: HTMLElement) {
         this._stack = []
         this._limit = limit
-        this._fireEvent = typeof CustomEvent != 'undefined' && undoScopeHost && undoScopeHost.dispatchEvent
+        this._fireEvent = (typeof CustomEvent != 'undefined' && undoScopeHost != null && undoScopeHost.dispatchEvent != null)
         this._ush = undoScopeHost
 
         this.position = 0
