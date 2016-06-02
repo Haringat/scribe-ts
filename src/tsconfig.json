@@ -4,6 +4,7 @@
         "module": "amd",
         "target": "es5",
         "outFile": "../dist/scribe.js",
-        "sourceMap": true
+        "sourceMap": true,
+        "watch": true
     }
 }

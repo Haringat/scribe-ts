@@ -1,9 +1,3 @@
-/build/
-/node_modules/
-/bower_components/
-/vendor/
-/examples/build.js
-.tern-port
-.npm-debug.log
-.DS_Store
-dist
+node_modules/
+.vscode/
+dist/

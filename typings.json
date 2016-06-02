@@ -1,0 +1,4 @@
+{
+    "name": "scribe-ts",
+    "main": "dist/scribe.d.ts"
+}

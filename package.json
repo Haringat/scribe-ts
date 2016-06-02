@@ -1,45 +1,19 @@
 {
-  "name": "scribe-editor",
-  "version": "2.2.2",
+  "name": "scribe-ts",
+  "version": "0.1.0",
   "license": "Apache-2.0",
-  "main": "src/scribe.js",
-  "dependencies": {
-    "lodash-amd": "~3.5.0",
-    "immutable": "~3.7.3"
-  },
+  "main": "dist/scribe.js",
   "devDependencies": {
-    "chai": "~1.9.1",
-    "connect": "~2.12.0",
-    "grunt": "^0.4.5",
-    "grunt-contrib-requirejs": "^1.0.0",
-    "grunt-mocha-test": "^0.12.7",
-    "grunt-cli": "^0.1",
-    "http-server": "~0.6.1",
-    "lodash-node": "~2.4.1",
-    "mocha": "~2.4",
-    "mock-browser": "0.90.33",
-    "mversion": "~0.4.3",
-    "node-amd-require": "^0.2.2",
-    "npm": "^2.5.0",
-    "plumber": "~0.4.0",
-    "plumber-all": "~0.4.0",
-    "plumber-cli": "~0.4.0",
-    "plumber-glob": "~0.4.0",
-    "plumber-requirejs": "~0.4.0",
-    "plumber-uglifyjs": "~0.4.0",
-    "plumber-write": "~0.4.0",
-    "q": "~1.2",
-    "request": "~2.33.0",
-    "scribe-test-harness": "~0.0.21",
-    "selenium-webdriver": "~2.41.0",
-    "sinon": "^1.12.2"
+    "typescript": "^1.8",
+    "uglify-js": "^2.6"
   },
   "scripts": {
-    "test": "node_modules/.bin/grunt test",
-    "build": "node_modules/.bin/grunt build"
+    "watch": "node_modules/.bin/tsc --project src/tsconfig.json",
+    "build": "node_modules/.bin/tsc --project src/tsconfig.release.json --rootDir src && npm run minify",
+    "minify": "node_modules/.bin/uglifyjs --compress --in-source-map dist/scribe.js.map --output dist/scribe.min.js --source-map dist/scribe.min.js.map -- dist/scribe.js"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/guardian/scribe.git"
+    "url": "https://bitbucket.org/mindplaydk/scribe-ts.git"
   }
 }
