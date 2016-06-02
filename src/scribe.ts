@@ -7,7 +7,7 @@ import * as patches from "./scribe/plugins/core/patches"
 import { ScribeApi } from "./scribe/api"
 import { TransactionManager } from "./scribe/transaction-manager"
 import { ScribeUndoManager } from "./scribe/undo-manager"
-import EventEmitter = require("./scribe/event-emitter")
+import { EventEmitter } from "./scribe/event-emitter"
 import * as nodeHelpers from "./scribe/node"
 import * as config from "./scribe/config"
 import { CommandInterface } from "./scribe/api/command"
@@ -20,6 +20,18 @@ export interface ScribePlugin {
 
 export interface Filter {
     (html: string): string
+}
+
+export class FilterList {
+    private filters: Filter[] = []
+
+    filter(content: string): string {
+        return this.filters.reduce((formattedData, formatter) => formatter(formattedData), content)
+    }
+    
+    add(filter: Filter) {
+        this.filters.push(filter)
+    }
 }
 
 export class Scribe extends EventEmitter {
@@ -299,17 +311,5 @@ export class Scribe extends EventEmitter {
     
     destroy() {
         this.trigger(eventNames.destroy)
-    }
-}
-
-class FilterList {
-    private filters: Filter[] = []
-
-    filter(content: string): string {
-        return this.filters.reduce((formattedData, formatter) => formatter(formattedData), content)
-    }
-    
-    add(filter: Filter) {
-        this.filters.push(filter)
     }
 }

@@ -3,7 +3,7 @@
     "compilerOptions": {
         "module": "amd",
         "target": "es5",
-        "sourceMap": true,
-        "outFile": "../dist/scribe.js"
+        "outFile": "../dist/scribe.js",
+        "sourceMap": true
     }
 }

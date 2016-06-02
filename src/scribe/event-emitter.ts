@@ -4,7 +4,7 @@ import { removeValue } from "./util"
 // TODO: unit test
 // Good example of a complete(?) implementation: https://github.com/Wolfy87/EventEmitter
 
-export = class EventEmitter {
+export class EventEmitter {
 
     private _listeners: { [name: string]: Function[] }
 

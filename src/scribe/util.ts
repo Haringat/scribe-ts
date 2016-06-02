@@ -1,6 +1,6 @@
-type ItemList<T> = { length: number, item(i: number): T }
+export type ItemList<T> = { length: number, item(i: number): T }
 
-type Predicate<T> = { (value: T) : boolean }
+export type Predicate<T> = { (value: T) : boolean }
 
 /// Remove all occurrence of a given value from a given Array
 export function removeValue(array: any[], value: any) {

@@ -1,9 +1,4 @@
-import bold = require("./patches/commands/bold")
-import indent = require("./patches/commands/indent")
-import insertHTML = require("./patches/commands/insert-html")
-import insertList = require("./patches/commands/insert-list")
-import outdent = require("./patches/commands/outdent")
-import createLink = require("./patches/commands/create-link")
+import commands = require("./patches/commands")
 import events = require("./patches/events")
 
 /**
@@ -12,16 +7,7 @@ import events = require("./patches/events")
  * applying/unapplying commands — that is the job of the core commands.
  */
 
-var patches = {
-    commands: {
-        bold,
-        indent,
-        insertHTML,
-        insertList,
-        outdent,
-        createLink,
-    },
+export {
+    commands,
     events
 }
-
-export = patches

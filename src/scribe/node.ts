@@ -98,7 +98,7 @@ export function removeNode(node: Node): Node {
     return node.parentNode.removeChild(node)
 }
 
-type NodeFilter = { (node: Node): boolean }
+export type NodeFilter = { (node: Node): boolean }
 
 export function getAncestor(node: Node, rootElement: Node, nodeFilter: NodeFilter): Node {
     function isTopContainerElement(element: Node) {

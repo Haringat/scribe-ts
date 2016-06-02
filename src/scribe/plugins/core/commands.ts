@@ -6,7 +6,7 @@ import subscript = require("./commands/subscript")
 import superscript = require("./commands/superscript")
 import undo = require("./commands/undo")
 
-var plugins = {
+export {
     indent,
     insertList,
     outdent,
@@ -15,5 +15,3 @@ var plugins = {
     superscript,
     undo
 }
-
-export = plugins

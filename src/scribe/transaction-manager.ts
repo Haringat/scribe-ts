@@ -11,7 +11,6 @@ export class TransactionManager {
         this.scribe = scribe
     }
 
-
     start() {
         this.history.push(1)
     }

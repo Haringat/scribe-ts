@@ -69,7 +69,7 @@ export function checkOptions(userSuppliedOptions: ScribeOptions) {
     return Object.freeze(merge(defaultOptions, options)) as ScribeOptions
 }
 
-interface Sorter {
+export interface Sorter {
     (a, b): number
 }
 
@@ -94,7 +94,7 @@ export function sortByPlugin(priorityPlugin: string): Sorter {
     }
 }
 
-interface Filter {
+export interface Filter {
     (value): boolean
 }
 
