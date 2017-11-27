@@ -1,10 +1,13 @@
 {
     "$schema": "http://json.schemastore.org/tsconfig",
     "compilerOptions": {
-        "module": "amd",
+        "module": "commonjs",
         "target": "es5",
-        "outFile": "../dist/scribe.js",
         "sourceMap": true,
-        "watch": true
-    }
+        "declaration": true
+    },
+    "include": [
+        "src/**/*.ts",
+        "index.ts"
+    ]
 }

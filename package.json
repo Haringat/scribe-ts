@@ -2,18 +2,26 @@
   "name": "scribe-ts",
   "version": "0.1.0",
   "license": "Apache-2.0",
-  "main": "dist/scribe.js",
+  "main": "./index.js",
+  "typings": "./scribe.d.ts",
+    "files": [
+        "index.js",
+        "index.d.ts",
+        "src/**/*.js",
+        "src/**/*.d.ts"
+    ],
   "devDependencies": {
-    "typescript": "^1.8",
+    "typescript": "^2.6.1",
     "uglify-js": "^2.6"
   },
   "scripts": {
-    "watch": "node_modules/.bin/tsc --project src/tsconfig.json",
-    "build": "node_modules/.bin/tsc --project src/tsconfig.release.json --rootDir src && npm run minify",
-    "minify": "node_modules/.bin/uglifyjs --compress --in-source-map dist/scribe.js.map --output dist/scribe.min.js --source-map dist/scribe.min.js.map -- dist/scribe.js"
+    "build": "node_modules/.bin/tsc --project tsconfig.json"
   },
   "repository": {
     "type": "git",
     "url": "https://bitbucket.org/mindplaydk/scribe-ts.git"
+  },
+  "dependencies": {
+    "global": "^4.3.2"
   }
 }
